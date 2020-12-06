@@ -1,0 +1,13 @@
+server:
+  port: 8001
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql:///oauth2
+    username: root
+    password: 123456
+  main:
+    allow-bean-definition-overriding: true # 允许覆盖spring 创建的ioc对象
+
+
+
