@@ -1,10 +1,10 @@
-package com.xh.security_oauth;
+package com.xh.security_mockuser;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SecurityOauthApplicationTests {
+class SecurityMockuserApplicationTests {
 
     @Test
     void contextLoads() {
