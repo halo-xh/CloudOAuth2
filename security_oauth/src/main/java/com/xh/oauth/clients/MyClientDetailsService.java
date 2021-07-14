@@ -1,10 +1,12 @@
 package com.xh.oauth.clients;
 
 import com.xh.oauth.clients.entity.MyClientDetails;
-import com.xh.oauth.clients.repo.MyClientDetailsRepository;
+import com.xh.oauth.clients.service.DClientDetailsService;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.*;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -17,44 +19,52 @@ import java.util.Optional;
  */
 public class MyClientDetailsService implements ClientDetailsService, ClientRegistrationService {
 
-    private MyClientDetailsRepository clientDetailsRepository;
+    private final DClientDetailsService detailsService;
 
-    public MyClientDetailsService(MyClientDetailsRepository myClientDetailsRepository) {
-        this.clientDetailsRepository = myClientDetailsRepository;
+    private PasswordEncoder passwordEncoder;
+
+    public MyClientDetailsService(DClientDetailsService detailsService) {
+        this.detailsService = detailsService;
     }
 
     @Override
     public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
-        return clientDetailsRepository.findById(clientId).orElse(null);
+        return detailsService.findById(clientId).orElse(null);
     }
+
 
     @Override
     public void addClientDetails(ClientDetails clientDetails) throws ClientAlreadyExistsException {
-        clientDetailsRepository.saveAndFlush((MyClientDetails) clientDetails);
+        detailsService.saveAndFlush((MyClientDetails) clientDetails);
     }
 
     @Override
     public void updateClientDetails(ClientDetails clientDetails) throws NoSuchClientException {
-        clientDetailsRepository.saveAndFlush((MyClientDetails) clientDetails);
+        detailsService.saveAndFlush((MyClientDetails) clientDetails);
     }
 
     @Override
     public void updateClientSecret(String clientId, String secret) throws NoSuchClientException {
-        Optional<MyClientDetails> details = clientDetailsRepository.findById(clientId);
+        Optional<MyClientDetails> details = detailsService.findById(clientId);
         if (details.isPresent()) {
             MyClientDetails myClientDetails = details.get();
             myClientDetails.setClientSecret(secret);
-            clientDetailsRepository.save(myClientDetails);
+            detailsService.save(myClientDetails);
         }
     }
 
     @Override
     public void removeClientDetails(String clientId) throws NoSuchClientException {
-        clientDetailsRepository.deleteById(clientId);
+        detailsService.deleteById(clientId);
     }
 
     @Override
     public List<ClientDetails> listClientDetails() {
-        return new LinkedList<>(clientDetailsRepository.findAll());
+        List<MyClientDetails> all = detailsService.findAll();
+        return new LinkedList<>(all);
+    }
+
+    public void setPasswordEncoder(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 }

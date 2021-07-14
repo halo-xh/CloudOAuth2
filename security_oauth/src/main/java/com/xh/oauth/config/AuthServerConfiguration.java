@@ -1,13 +1,17 @@
 package com.xh.oauth.config;
 
+import com.xh.oauth.clients.MyJdbcClientDetailsServiceBuilder;
 import com.xh.oauth.exception.AuthTokenExceptionHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;
+import org.springframework.security.oauth2.config.annotation.builders.JdbcClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
@@ -15,49 +19,49 @@ import org.springframework.security.oauth2.provider.token.AuthorizationServerTok
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
 import javax.sql.DataSource;
-import java.util.concurrent.TimeUnit;
 
 /**
  * author  Xiao Hong
  * date  2021/7/13 23:41
- * description
+ * description 授权服务配置类 {@link EnableAuthorizationServer}
  */
 @Configuration
+@EnableAuthorizationServer
 public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
 
-    private final AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager; //todo.
 
     private final UserDetailsService userDetailsService;
 
     private final PasswordEncoder passwordEncoder;
 
-    private final TokenStore tokenStore;
+    private final TokenStore tokenStore;// todo. db - redis
 
     private final AuthorizationCodeServices authorizationCodeServices;
 
     private final AuthTokenExceptionHandler authTokenExceptionHandler;
 
-    private final DataSource dataSource;
-
     private final AuthorizationServerTokenServices tokenService;
 
+    private final ClientDetailsServiceBuilder<MyJdbcClientDetailsServiceBuilder> jdbcClientDetailsServiceBuilder;
+
     public AuthServerConfiguration(AuthenticationManager authenticationManager,
-                                   @Qualifier("myUserDetailServiceImpl") UserDetailsService userDetailsService,
+                                   UserDetailsService userDetailsService,
                                    PasswordEncoder passwordEncoder,
                                    TokenStore tokenStore,
                                    AuthorizationCodeServices authorizationCodeServices,
                                    AuthTokenExceptionHandler authTokenExceptionHandler,
-                                   DataSource dataSource,
-                                   AuthorizationServerTokenServices tokenService) {
+                                   AuthorizationServerTokenServices tokenService,
+                                   ClientDetailsServiceBuilder<MyJdbcClientDetailsServiceBuilder> jdbcClientDetailsServiceBuilder) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
         this.tokenStore = tokenStore;
         this.authorizationCodeServices = authorizationCodeServices;
         this.authTokenExceptionHandler = authTokenExceptionHandler;
-        this.dataSource = dataSource;
         this.tokenService = tokenService;
+        this.jdbcClientDetailsServiceBuilder = jdbcClientDetailsServiceBuilder;
     }
 
     /**
@@ -65,7 +69,7 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.jdbc(dataSource);
+        clients.configure(jdbcClientDetailsServiceBuilder);
     }
 
     @Override

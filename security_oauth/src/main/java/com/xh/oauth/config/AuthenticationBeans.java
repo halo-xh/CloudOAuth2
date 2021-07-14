@@ -1,24 +1,34 @@
 package com.xh.oauth.config;
 
+import com.xh.oauth.clients.MyClientDetailsService;
+import com.xh.oauth.clients.MyJdbcClientDetailsServiceBuilder;
+import com.xh.oauth.clients.service.DClientDetailsService;
 import com.xh.oauth.exception.AuthClientExceptionHandler;
 import com.xh.oauth.exception.AuthTokenExceptionHandler;
+import com.xh.oauth.token.MyAuthorizationCodeServices;
+import com.xh.oauth.web.AuthorityService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
+import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;
+import org.springframework.security.oauth2.config.annotation.builders.JdbcClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
-import org.springframework.security.oauth2.provider.code.InMemoryAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
+
+import javax.sql.DataSource;
 
 /**
  * author  Xiao Hong
@@ -27,6 +37,41 @@ import org.springframework.security.oauth2.provider.token.store.redis.RedisToken
  */
 @Configuration
 public class AuthenticationBeans {
+
+    // ========================================================
+    // ==================CLIENTS CONFIGURATION=================
+    // ========================================================
+
+    @Bean(name = "JdbcClientDetailsServiceBuilder")
+    public ClientDetailsServiceBuilder<MyJdbcClientDetailsServiceBuilder>
+    clientDetailsServiceBuilder(DataSource dataSource,
+                                MyClientDetailsService clientDetailsService) {
+        MyJdbcClientDetailsServiceBuilder jdbcClientDetailsServiceBuilder = new MyJdbcClientDetailsServiceBuilder();
+        jdbcClientDetailsServiceBuilder.setDataSource(dataSource);
+        jdbcClientDetailsServiceBuilder.setPasswordEncoder(passwordEncoder());
+        jdbcClientDetailsServiceBuilder.setMyClientDetailsService(clientDetailsService);
+        return jdbcClientDetailsServiceBuilder;
+    }
+
+
+    /**
+     * A service that provides the details about an OAuth2 client.
+     *
+     * @return service
+     */
+    @Bean
+    public MyClientDetailsService clientDetailsService(DClientDetailsService detailsService) {
+        return new MyClientDetailsService(detailsService);
+    }
+
+    /**
+     * Services for issuing and storing authorization codes.
+     **/
+    @Bean
+    public AuthorizationCodeServices authorizationCodeServices() {
+        return new MyAuthorizationCodeServices();
+    }
+
 
     @Bean
     public AuthClientExceptionHandler authClientExceptionHandler() {
@@ -63,7 +108,7 @@ public class AuthenticationBeans {
     }
 
     @Bean
-    @Primary
+    @Primary //todo.
     public AuthorizationServerTokenServices defaultTokenServices(TokenStore tokenStore,
                                                                  JwtAccessTokenConverter jwtAccessTokenConverter,
                                                                  ClientDetailsService clientDetailsService,
@@ -76,7 +121,6 @@ public class AuthenticationBeans {
         defaultTokenServices.setRefreshTokenValiditySeconds(7200);
         defaultTokenServices.setClientDetailsService(clientDetailsService);
         defaultTokenServices.setAuthenticationManager(authenticationManager);
-
         return defaultTokenServices;
     }
 
@@ -90,11 +134,18 @@ public class AuthenticationBeans {
         return jwtAccessTokenConverter;
     }
 
-    /**
-     * code 生成服务
-     **/
+
+    // ========================================================
+    // ======================USER AUTH CONFIG==================
+    // ========================================================
     @Bean
-    public AuthorizationCodeServices authorizationCodeServices() {
-        return new InMemoryAuthorizationCodeServices();
+    public DBAuthenticationProvider dbauthenticationprovider(UserDetailsService userDetailsService, AuthorityService authorityService) {
+        DBAuthenticationProvider dbAuthenticationProvider = new DBAuthenticationProvider();
+        dbAuthenticationProvider.setUserDetailsService(userDetailsService);
+        dbAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        dbAuthenticationProvider.setAuthorityService(authorityService);// todo.
+        dbAuthenticationProvider.setForcePrincipalAsString(true);
+        return dbAuthenticationProvider;
     }
+
 }

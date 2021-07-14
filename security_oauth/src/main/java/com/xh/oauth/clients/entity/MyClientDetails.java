@@ -3,13 +3,15 @@ package com.xh.oauth.clients.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.provider.ClientDetails;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.*;
+
 /**
  * @author xiaohong
  * @version 1.0
@@ -18,29 +20,46 @@ import java.util.*;
  */
 @Entity
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class MyClientDetails implements ClientDetails {
 
     @Id
+    @GeneratedValue(generator = "idCreator",
+            strategy = GenerationType.SEQUENCE)
+    @GenericGenerator(
+            name = "idCreator",
+            strategy = "com.xh.oauth.utils.IdCreator"
+    )
+    private Long id;
+
+    @Column(name = "client_id", nullable = false, columnDefinition = "varchar(255) comment '客户端id'")
     private String clientId;
 
+    @Column(name = "client_secret", nullable = false, columnDefinition = "varchar(255) comment '客户端密码'")
     private String clientSecret;
 
+    @Column(name = "scope", nullable = false, columnDefinition = "varchar(255) comment 'scope'")
     private String scope;
 
+    @Column(name = "resource_ids", nullable = false, columnDefinition = "varchar(1000) comment '资源ids'")
     private String resourceIds;
 
+    @Column(name = "authorized_grant_types", nullable = false, columnDefinition = "varchar(1000) comment '授权类型'")
     private String authorizedGrantTypes;
 
+    @Column(name = "registered_redirect_uris", nullable = false, columnDefinition = "varchar(1000) comment '重定向uri'")
     private String registeredRedirectUris;
 
+    @Column(name = "auto_approve_scopes", nullable = false, columnDefinition = "varchar(64) defau 'false' comment '自动同意:true,false'")
     private String autoApproveScopes;
 
+    @Column(name = "authorities", nullable = false, columnDefinition = "varchar(1000) comment '权限'")
     private String authorities;
 
+    @Column(name = "access_token_validity_seconds", nullable = false, columnDefinition = "int comment default 30 'token过期时间'")
     private Integer accessTokenValiditySeconds;
 
+    @Column(name = "refresh_token_validity_seconds", nullable = false, columnDefinition = "varchar(255) comment default 3000 'token刷新时间'")
     private Integer refreshTokenValiditySeconds;
 
 //    private Map<String, Object> additionalInformation = new LinkedHashMap<String, Object>();
