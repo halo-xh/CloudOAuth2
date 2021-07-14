@@ -1,5 +1,7 @@
 package com.xh.oauth.config;
 
+import com.xh.oauth.exception.AuthClientExceptionHandler;
+import com.xh.oauth.exception.AuthTokenExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -47,7 +49,7 @@ public class AuthenticationBeans {
     /**
      * token 存储器
      **/
-    //@Bean
+    @Bean
     public TokenStore tokenStore(RedisConnectionFactory redisConnectionFactory) {
         return new RedisTokenStore(redisConnectionFactory);
     }
@@ -55,7 +57,7 @@ public class AuthenticationBeans {
     /**
      * token 存储器 JWT
      **/
-    @Bean
+//    @Bean
     public TokenStore tokenStore(JwtAccessTokenConverter jwtAccessTokenConverter) {
         return new JwtTokenStore(jwtAccessTokenConverter);
     }

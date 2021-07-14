@@ -1,5 +1,7 @@
 package com.xh.oauth.config;
 
+import com.xh.oauth.exception.AuthTokenExceptionHandler;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -9,8 +11,10 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
+import javax.sql.DataSource;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,7 +23,6 @@ import java.util.concurrent.TimeUnit;
  * description
  */
 @Configuration
-
 public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
 
@@ -35,42 +38,34 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
 
     private final AuthTokenExceptionHandler authTokenExceptionHandler;
 
+    private final DataSource dataSource;
+
+    private final AuthorizationServerTokenServices tokenService;
+
     public AuthServerConfiguration(AuthenticationManager authenticationManager,
-                                   UserDetailsService userDetailsService,
+                                   @Qualifier("myUserDetailServiceImpl") UserDetailsService userDetailsService,
                                    PasswordEncoder passwordEncoder,
                                    TokenStore tokenStore,
                                    AuthorizationCodeServices authorizationCodeServices,
-                                   AuthTokenExceptionHandler authTokenExceptionHandler) {
+                                   AuthTokenExceptionHandler authTokenExceptionHandler,
+                                   DataSource dataSource,
+                                   AuthorizationServerTokenServices tokenService) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
         this.tokenStore = tokenStore;
         this.authorizationCodeServices = authorizationCodeServices;
         this.authTokenExceptionHandler = authTokenExceptionHandler;
+        this.dataSource = dataSource;
+        this.tokenService = tokenService;
     }
 
+    /**
+     * 配置客户端的信息获取
+     */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-
-        clients.inMemory()
-                .withClient("test_client_1224")
-                .secret(secret)
-                .scopes("all", "test")
-                .resourceIds("admin")
-                // autoApprove 可跳过授权页直接返回code
-                .autoApprove("all")
-                .redirectUris("http://www.baidu.com")
-                //客户端认证所支持的授权类型 1:客户端凭证 2:账号密码 3:授权码 4:token刷新 5:简易模式
-                .authorizedGrantTypes("authorization_code")
-                //用户角色
-                .authorities("admin")
-                //允许自动授权
-                .autoApprove(false)
-                //token 过期时间
-                .accessTokenValiditySeconds((int) TimeUnit.HOURS.toSeconds(12))
-                //refresh_token 过期时间
-                .refreshTokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(30))
-        ;
+        clients.jdbc(dataSource);
     }
 
     @Override
@@ -88,6 +83,7 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
         // 配置授权服务器端点的属性
         endpoints.authenticationManager(authenticationManager)    //认证管理器
                 .tokenStore(tokenStore)
+                .tokenServices(tokenService)
                 .authorizationCodeServices(authorizationCodeServices)
                 .userDetailsService(userDetailsService)
                 .exceptionTranslator(authTokenExceptionHandler);
