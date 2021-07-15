@@ -6,8 +6,10 @@ import com.xh.oauth.clients.service.DClientDetailsService;
 import com.xh.oauth.exception.AuthClientExceptionHandler;
 import com.xh.oauth.exception.AuthTokenExceptionHandler;
 import com.xh.oauth.token.MyAuthorizationCodeServices;
+import com.xh.oauth.token.service.OAuthenticationStoreService;
+import com.xh.oauth.utils.SnowflakeIdWorker;
 import com.xh.oauth.web.AuthorityService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -18,8 +20,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;
-import org.springframework.security.oauth2.config.annotation.builders.JdbcClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.approval.ApprovalStore;
+import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
@@ -42,34 +45,44 @@ public class AuthenticationBeans {
     // ==================CLIENTS CONFIGURATION=================
     // ========================================================
 
-    @Bean(name = "JdbcClientDetailsServiceBuilder")
-    public ClientDetailsServiceBuilder<MyJdbcClientDetailsServiceBuilder>
-    clientDetailsServiceBuilder(DataSource dataSource,
-                                MyClientDetailsService clientDetailsService) {
-        MyJdbcClientDetailsServiceBuilder jdbcClientDetailsServiceBuilder = new MyJdbcClientDetailsServiceBuilder();
-        jdbcClientDetailsServiceBuilder.setDataSource(dataSource);
-        jdbcClientDetailsServiceBuilder.setPasswordEncoder(passwordEncoder());
-        jdbcClientDetailsServiceBuilder.setMyClientDetailsService(clientDetailsService);
-        return jdbcClientDetailsServiceBuilder;
+    /**
+     * 密码解析器
+     **/
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
-
 
     /**
      * A service that provides the details about an OAuth2 client.
      *
      * @return service
      */
-    @Bean
+    @Bean(name = "myClientDetailsService")
     public MyClientDetailsService clientDetailsService(DClientDetailsService detailsService) {
         return new MyClientDetailsService(detailsService);
     }
 
     /**
+     * Builder for OAuth2 client details service.
+     */
+    @Bean(name = "JdbcClientDetailsServiceBuilder")
+    public ClientDetailsServiceBuilder<MyJdbcClientDetailsServiceBuilder>
+    clientDetailsServiceBuilder(DataSource dataSource,
+                                MyClientDetailsService clientDetailsService) {
+        MyJdbcClientDetailsServiceBuilder jdbcClientDetailsServiceBuilder = new MyJdbcClientDetailsServiceBuilder();
+        jdbcClientDetailsServiceBuilder.setDataSource(dataSource);
+        jdbcClientDetailsServiceBuilder.setMyClientDetailsService(clientDetailsService);
+        return jdbcClientDetailsServiceBuilder;
+    }
+
+
+    /**
      * Services for issuing and storing authorization codes.
      **/
     @Bean
-    public AuthorizationCodeServices authorizationCodeServices() {
-        return new MyAuthorizationCodeServices();
+    public AuthorizationCodeServices authorizationCodeServices(SnowflakeIdWorker idWorker, OAuthenticationStoreService authenticationStoreService) {
+        return new MyAuthorizationCodeServices(authenticationStoreService, idWorker);
     }
 
 
@@ -84,19 +97,28 @@ public class AuthenticationBeans {
     }
 
     /**
-     * 密码解析器
-     **/
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    /**
      * token 存储器
      **/
     @Bean
     public TokenStore tokenStore(RedisConnectionFactory redisConnectionFactory) {
         return new RedisTokenStore(redisConnectionFactory);
+    }
+
+    @Bean
+    public ApprovalStore approvalStore(TokenStore tokenStore){
+        TokenApprovalStore tokenApprovalStore = new TokenApprovalStore();
+        tokenApprovalStore.setTokenStore(tokenStore);
+        return tokenApprovalStore;
+    }
+
+    @Bean
+    public JwtAccessTokenConverter jwtAccessTokenConverter() {
+        JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+        // 签名密钥
+        jwtAccessTokenConverter.setSigningKey("sign_key");
+        // 验证密钥
+        jwtAccessTokenConverter.setVerifier(new MacSigner("sign_key"));
+        return jwtAccessTokenConverter;
     }
 
     /**
@@ -111,7 +133,7 @@ public class AuthenticationBeans {
     @Primary //todo.
     public AuthorizationServerTokenServices defaultTokenServices(TokenStore tokenStore,
                                                                  JwtAccessTokenConverter jwtAccessTokenConverter,
-                                                                 ClientDetailsService clientDetailsService,
+                                                                 @Qualifier("myClientDetailsService") ClientDetailsService clientDetailsService,
                                                                  AuthenticationManager authenticationManager) {
         DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
         defaultTokenServices.setSupportRefreshToken(true);
@@ -124,28 +146,18 @@ public class AuthenticationBeans {
         return defaultTokenServices;
     }
 
-    @Bean
-    public JwtAccessTokenConverter jwtAccessTokenConverter() {
-        JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
-        // 签名密钥
-        jwtAccessTokenConverter.setSigningKey("sign_key");
-        // 验证密钥
-        jwtAccessTokenConverter.setVerifier(new MacSigner("sign_key"));
-        return jwtAccessTokenConverter;
-    }
-
 
     // ========================================================
     // ======================USER AUTH CONFIG==================
     // ========================================================
-    @Bean
-    public DBAuthenticationProvider dbauthenticationprovider(UserDetailsService userDetailsService, AuthorityService authorityService) {
-        DBAuthenticationProvider dbAuthenticationProvider = new DBAuthenticationProvider();
-        dbAuthenticationProvider.setUserDetailsService(userDetailsService);
-        dbAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        dbAuthenticationProvider.setAuthorityService(authorityService);// todo.
-        dbAuthenticationProvider.setForcePrincipalAsString(true);
-        return dbAuthenticationProvider;
-    }
+//    @Bean
+//    public DBAuthenticationProvider dbauthenticationprovider(UserDetailsService userDetailsService, AuthorityService authorityService) {
+//        DBAuthenticationProvider dbAuthenticationProvider = new DBAuthenticationProvider();
+//        dbAuthenticationProvider.setUserDetailsService(userDetailsService);
+//        dbAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+//        dbAuthenticationProvider.setAuthorityService(authorityService);// todo.
+//        dbAuthenticationProvider.setForcePrincipalAsString(true);
+//        return dbAuthenticationProvider;
+//    }
 
 }

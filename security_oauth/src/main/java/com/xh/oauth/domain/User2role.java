@@ -20,6 +20,7 @@ import java.util.Date;
  */
 @Data
 @Entity
+@Table
 @EntityListeners(AuditingEntityListener.class)
 public class User2role {
 

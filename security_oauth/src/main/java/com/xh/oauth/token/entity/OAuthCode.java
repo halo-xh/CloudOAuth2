@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -18,11 +19,13 @@ import java.util.Date;
  */
 @Entity
 @Data
+@Table
 @AllArgsConstructor
 @NoArgsConstructor
-public class OAuthStore {
+@EntityListeners(AuditingEntityListener.class)
+public class OAuthCode {
 
-    public OAuthStore(String code, byte[] authentication, DeletedEnum deleted) {
+    public OAuthCode(String code, byte[] authentication, DeletedEnum deleted) {
         this.code = code;
         this.authentication = authentication;
         this.deleted = deleted;
@@ -33,8 +36,7 @@ public class OAuthStore {
             strategy = GenerationType.SEQUENCE)
     @GenericGenerator(
             name = "idCreator",
-            strategy = "com.xh.oauth.utils.IdCreator"
-    )
+            strategy = "com.xh.oauth.utils.IdCreator")
     private String code;
 
     @Lob

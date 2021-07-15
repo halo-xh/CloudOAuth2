@@ -11,7 +11,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       poolName: Hikari
-      auto-commit: false
+      auto-commit: true
   redis:
     database: 0
     host: 127.0.0.1
@@ -20,8 +20,14 @@ spring:
 
   jpa:
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-    database: MYSQL
     show-sql: true
+    database: mysql
+    generate-ddl: true
+    open-in-view: false
+    hibernate:
+      naming:
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+      ddl-auto: create
     properties:
       hibernate.hbm2ddl.auto: none
       hibernate.query.substitutions: true 'T', false 'F'
@@ -33,6 +39,7 @@ spring:
       #      hibernate.ejb.interceptor:
       hibernate.id.new_generator_mappings: true
       hibernate.connection.provider_disables_autocommit: true
+
 #      hibernate.cache.use_second_level_cache: true
 #      hibernate.cache.use_query_cache: false
 #      hibernate.generate_statistics: false
@@ -40,6 +47,3 @@ spring:
 #      hibernate.cache.hazelcast.instance_name: Ehazelcast
 #      hibernate.cache.use_minimal_puts: true
 #      hibernate.cache.hazelcast.use_lite_member: true
-    hibernate:
-      naming:
-        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy

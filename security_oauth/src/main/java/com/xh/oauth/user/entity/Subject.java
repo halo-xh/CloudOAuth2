@@ -15,6 +15,7 @@ import java.util.Date;
  * @since 2020-12-09
  */
 @Data
+@Table
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 public class Subject {

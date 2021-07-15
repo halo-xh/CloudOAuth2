@@ -1,9 +1,8 @@
 package com.xh.oauth.token;
 
-import com.xh.oauth.token.entity.OAuthStore;
+import com.xh.oauth.token.entity.OAuthCode;
 import com.xh.oauth.token.service.OAuthenticationStoreService;
 import com.xh.oauth.utils.DeletedEnum;
-import com.xh.oauth.utils.IdCreator;
 import com.xh.oauth.utils.SnowflakeIdWorker;
 import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -35,14 +34,14 @@ public class MyAuthorizationCodeServices implements AuthorizationCodeServices {
     public String createAuthorizationCode(OAuth2Authentication authentication) {
         String code = String.valueOf(idWorker.nextId());
         byte[] serialize = SerializationUtils.serialize(authentication);
-        OAuthStore authStore = new OAuthStore(code, serialize, DeletedEnum.NO);
-        OAuthStore save = authenticationStoreService.save(authStore);
+        OAuthCode authStore = new OAuthCode(code, serialize, DeletedEnum.NO);
+        OAuthCode save = authenticationStoreService.save(authStore);
         return save.getCode();
     }
 
     @Override
     public OAuth2Authentication consumeAuthorizationCode(String code) throws InvalidGrantException {
-        OAuthStore remove = authenticationStoreService.remove(code);
+        OAuthCode remove = authenticationStoreService.remove(code);
         OAuth2Authentication auth = (OAuth2Authentication) SerializationUtils.deserialize(remove.getAuthentication());
         if (auth == null) {
             throw new InvalidGrantException("Invalid authorization code: " + code);

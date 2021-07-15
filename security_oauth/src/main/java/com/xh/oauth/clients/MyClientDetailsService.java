@@ -2,8 +2,6 @@ package com.xh.oauth.clients;
 
 import com.xh.oauth.clients.entity.MyClientDetails;
 import com.xh.oauth.clients.service.DClientDetailsService;
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.*;
 
@@ -21,7 +19,7 @@ public class MyClientDetailsService implements ClientDetailsService, ClientRegis
 
     private final DClientDetailsService detailsService;
 
-    private PasswordEncoder passwordEncoder;
+    private  PasswordEncoder passwordEncoder;
 
     public MyClientDetailsService(DClientDetailsService detailsService) {
         this.detailsService = detailsService;
@@ -48,7 +46,8 @@ public class MyClientDetailsService implements ClientDetailsService, ClientRegis
         Optional<MyClientDetails> details = detailsService.findById(clientId);
         if (details.isPresent()) {
             MyClientDetails myClientDetails = details.get();
-            myClientDetails.setClientSecret(secret);
+            String encode = passwordEncoder.encode(secret);
+            myClientDetails.setClientSecret(encode);
             detailsService.save(myClientDetails);
         }
     }

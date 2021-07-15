@@ -18,8 +18,9 @@ import java.util.*;
  * @date 2021/7/14 9:58
  * @description
  */
-@Entity
 @Data
+@Table
+@Entity
 @EntityListeners(AuditingEntityListener.class)
 public class MyClientDetails implements ClientDetails {
 

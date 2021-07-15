@@ -22,7 +22,7 @@ public class ExtUserDetailsServiceImpl implements ExtUserDetailsService {
 
     @Override
     public LoginUser loadUserByUsername(String username) throws UsernameNotFoundException {
-        Subject subject = subjectRepository.selectByLoginName(username);
+        Subject subject = subjectRepository.findByLoginName(username);
         if (subject != null) {
             LoginUser loginUser = new LoginUser();
             loginUser.setLoginname(subject.getLoginName());

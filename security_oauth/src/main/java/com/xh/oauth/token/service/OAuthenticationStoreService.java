@@ -1,10 +1,10 @@
 package com.xh.oauth.token.service;
 
-import com.xh.oauth.token.entity.OAuthStore;
+import com.xh.oauth.token.entity.OAuthCode;
 
 public interface OAuthenticationStoreService {
 
-    OAuthStore save(OAuthStore authStore);
+    OAuthCode save(OAuthCode authStore);
 
-    OAuthStore remove(String code);
+    OAuthCode remove(String code);
 }

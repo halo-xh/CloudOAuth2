@@ -1,6 +1,6 @@
 package com.xh.oauth.token.service;
 
-import com.xh.oauth.token.entity.OAuthStore;
+import com.xh.oauth.token.entity.OAuthCode;
 import com.xh.oauth.token.repo.OAuthenticationStoreRepository;
 import com.xh.oauth.utils.DeletedEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -23,16 +23,17 @@ public class OAuthenticationStoreServiceImpl implements OAuthenticationStoreServ
         this.authenticationStoreRepository = authenticationStoreRepository;
     }
 
-    public OAuthStore save(OAuthStore authStore) {
+    @Override
+    public OAuthCode save(OAuthCode authStore) {
         return authenticationStoreRepository.save(authStore);
     }
 
     @Override
-    public OAuthStore remove(String code) {
-        Optional<OAuthStore> authStore = authenticationStoreRepository.findById(code);
+    public OAuthCode remove(String code) {
+        Optional<OAuthCode> authStore = authenticationStoreRepository.findById(code);
         boolean present = authStore.isPresent();
         if (present) {
-            OAuthStore store = authStore.get();
+            OAuthCode store = authStore.get();
             store.setDeleted(DeletedEnum.YES);
             return authenticationStoreRepository.save(store);
         }
