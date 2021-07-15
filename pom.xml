@@ -11,7 +11,7 @@
         <module>security_oauth</module>
         <module>security_source</module>
         <module>security_thirdclient</module>
-        <module>security_mockuser</module>
+        <module>security_auth_center</module>
         <module>security_common</module>
     </modules>
 
@@ -22,11 +22,18 @@
         <alibaba.version>2.2.1.RELEASE</alibaba.version>
         <mybatis.version>2.1.4</mybatis.version>
         <jjwt.version>0.10.7</jjwt.version>
+        <common.version>0.0.1-SNAPSHOT</common.version>
     </properties>
 
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>CloudOAuth2</groupId>
+                <artifactId>security_common</artifactId>
+                <version>${common.version}</version>
+                <scope>compile</scope>
+            </dependency>
             <!--spring boot-->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
