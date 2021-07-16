@@ -1,19 +1,18 @@
 package com.xh.oauth.config;
 
+import com.xh.oauth.jwt.JWTFilter;
 import com.xh.oauth.user.service.ExtUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.BeanIds;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * @author xiaohong
@@ -29,18 +28,31 @@ public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final ExtUserDetailsService userDetailService;
 
-    public AuthSecurityConfiguration(PasswordEncoder passwordEncoder, ExtUserDetailsService userDetailService) {
+//    private final JWTFilter jwtFilter;
+
+    public AuthSecurityConfiguration(PasswordEncoder passwordEncoder,
+                                     ExtUserDetailsService userDetailService
+                                     ) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailService = userDetailService;
+//        this.jwtFilter = jwtFilter;
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .userDetailsService(userDetailsService())
-                .passwordEncoder(passwordEncoder);
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests().antMatchers("/oauth/**").permitAll()
+                .and()
+                .authorizeRequests().antMatchers(HttpMethod.TRACE, "**").denyAll()
+                .anyRequest().denyAll()
+                .and()
+                .csrf().disable()
+//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .headers().frameOptions().sameOrigin()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
-
 
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
     @Override

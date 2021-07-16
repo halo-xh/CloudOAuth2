@@ -20,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;
+import org.springframework.security.oauth2.config.annotation.builders.JdbcClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
@@ -67,11 +68,13 @@ public class AuthenticationBeans {
      * Builder for OAuth2 client details service.
      */
     @Bean(name = "jdbcClientDetailsServiceBuilder")
-    public ClientDetailsServiceBuilder<MyJdbcClientDetailsServiceBuilder>
-    clientDetailsServiceBuilder(DataSource dataSource,
-                                MyClientDetailsService clientDetailsService) {
+    public ClientDetailsServiceBuilder<JdbcClientDetailsServiceBuilder>
+    clientDetailsServiceBuilder(@Qualifier("dataSource") DataSource dataSource,
+                                MyClientDetailsService clientDetailsService,
+                                PasswordEncoder passwordEncoder) {
         MyJdbcClientDetailsServiceBuilder jdbcClientDetailsServiceBuilder = new MyJdbcClientDetailsServiceBuilder();
         jdbcClientDetailsServiceBuilder.setDataSource(dataSource);
+        jdbcClientDetailsServiceBuilder.setPasswordEncoder(passwordEncoder);
         jdbcClientDetailsServiceBuilder.setMyClientDetailsService(clientDetailsService);
         return jdbcClientDetailsServiceBuilder;
     }
@@ -130,7 +133,7 @@ public class AuthenticationBeans {
     }
 
     @Bean
-    @Primary //todo.
+    @Primary
     public AuthorizationServerTokenServices defaultTokenServices(TokenStore tokenStore,
                                                                  JwtAccessTokenConverter jwtAccessTokenConverter,
                                                                  @Qualifier("myClientDetailsService") ClientDetailsService clientDetailsService,
@@ -147,17 +150,10 @@ public class AuthenticationBeans {
     }
 
 
+
+
     // ========================================================
     // ======================USER AUTH CONFIG==================
     // ========================================================
-//    @Bean
-//    public DBAuthenticationProvider dbauthenticationprovider(UserDetailsService userDetailsService, AuthorityService authorityService) {
-//        DBAuthenticationProvider dbAuthenticationProvider = new DBAuthenticationProvider();
-//        dbAuthenticationProvider.setUserDetailsService(userDetailsService);
-//        dbAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-//        dbAuthenticationProvider.setAuthorityService(authorityService);// todo.
-//        dbAuthenticationProvider.setForcePrincipalAsString(true);
-//        return dbAuthenticationProvider;
-//    }
 
 }

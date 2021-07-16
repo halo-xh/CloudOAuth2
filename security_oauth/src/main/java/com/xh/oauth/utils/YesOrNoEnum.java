@@ -1,6 +1,6 @@
 package com.xh.oauth.utils;
 
-public enum DeletedEnum {
+public enum YesOrNoEnum {
     YES,
 
     NO;

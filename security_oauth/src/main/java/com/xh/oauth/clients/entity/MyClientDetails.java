@@ -1,8 +1,7 @@
 package com.xh.oauth.clients.entity;
 
-import lombok.AllArgsConstructor;
+import com.xh.oauth.utils.YesOrNoEnum;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.security.core.GrantedAuthority;
@@ -51,16 +50,16 @@ public class MyClientDetails implements ClientDetails {
     @Column(name = "registered_redirect_uris", nullable = false, columnDefinition = "varchar(1000) comment '重定向uri'")
     private String registeredRedirectUris;
 
-    @Column(name = "auto_approve_scopes", nullable = false, columnDefinition = "varchar(64) defau 'false' comment '自动同意:true,false'")
-    private String autoApproveScopes;
+    @Enumerated(EnumType.STRING)
+    private YesOrNoEnum autoApproveScopes = YesOrNoEnum.NO;
 
     @Column(name = "authorities", nullable = false, columnDefinition = "varchar(1000) comment '权限'")
     private String authorities;
 
-    @Column(name = "access_token_validity_seconds", nullable = false, columnDefinition = "int comment default 30 'token过期时间'")
+    @Column(name = "access_token_validity_seconds", nullable = false, columnDefinition = "int default 30 comment 'token过期时间'")
     private Integer accessTokenValiditySeconds;
 
-    @Column(name = "refresh_token_validity_seconds", nullable = false, columnDefinition = "varchar(255) comment default 3000 'token刷新时间'")
+    @Column(name = "refresh_token_validity_seconds", nullable = false, columnDefinition = "varchar(255)  default 3000 comment 'token刷新时间'")
     private Integer refreshTokenValiditySeconds;
 
 //    private Map<String, Object> additionalInformation = new LinkedHashMap<String, Object>();
@@ -131,12 +130,7 @@ public class MyClientDetails implements ClientDetails {
         if (autoApproveScopes == null) {
             return false;
         }
-        for (String auto : split(autoApproveScopes)) {
-            if ("true".equals(auto) || scope.matches(auto)) {
-                return true;
-            }
-        }
-        return false;
+        return autoApproveScopes ==YesOrNoEnum.YES;
     }
 
     @Override

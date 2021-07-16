@@ -2,8 +2,10 @@ package com.xh.oauth.clients;
 
 import com.xh.oauth.clients.entity.MyClientDetails;
 import com.xh.oauth.clients.service.DClientDetailsService;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.provider.*;
+import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -27,7 +29,18 @@ public class MyClientDetailsService implements ClientDetailsService, ClientRegis
 
     @Override
     public ClientDetails loadClientByClientId(String clientId) throws ClientRegistrationException {
-        return detailsService.findById(clientId).orElse(null);
+        try {
+            Optional<MyClientDetails> details = detailsService.findById(clientId);
+            boolean present = details.isPresent();
+            if (present){
+                return details.get();
+            }else {
+                throw new NoSuchClientException("No client with requested id: " + clientId);
+            }
+        }
+        catch (EmptyResultDataAccessException e) {
+            throw new NoSuchClientException("No client with requested id: " + clientId);
+        }
     }
 
 

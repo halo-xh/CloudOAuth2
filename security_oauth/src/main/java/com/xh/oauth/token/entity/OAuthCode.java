@@ -1,6 +1,6 @@
 package com.xh.oauth.token.entity;
 
-import com.xh.oauth.utils.DeletedEnum;
+import com.xh.oauth.utils.YesOrNoEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 public class OAuthCode {
 
-    public OAuthCode(String code, byte[] authentication, DeletedEnum deleted) {
+    public OAuthCode(String code, byte[] authentication, YesOrNoEnum deleted) {
         this.code = code;
         this.authentication = authentication;
         this.deleted = deleted;
@@ -41,11 +41,11 @@ public class OAuthCode {
 
     @Lob
     @Basic(fetch = FetchType.EAGER)
-    @Column(name = " authentication", columnDefinition = "authentication", nullable = false)
+    @Column(nullable = false)
     private byte[] authentication;
 
     @Enumerated(EnumType.STRING)
-    private DeletedEnum deleted = DeletedEnum.NO;
+    private YesOrNoEnum deleted = YesOrNoEnum.NO;
 
     @CreatedDate
     private Date createDate;

@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * @author xiaohong
  * @version 1.0
@@ -13,5 +15,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface MyClientDetailsRepository extends JpaRepository<MyClientDetails, String>, JpaSpecificationExecutor<MyClientDetails> {
+
+    Optional<MyClientDetails> findByClientId(String clientId);
 
 }

@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;
+import org.springframework.security.oauth2.config.annotation.builders.JdbcClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -44,7 +45,7 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
 
     private final AuthorizationServerTokenServices tokenService;
 
-    private final ClientDetailsServiceBuilder<MyJdbcClientDetailsServiceBuilder> jdbcClientDetailsServiceBuilder;
+    private final ClientDetailsServiceBuilder<JdbcClientDetailsServiceBuilder> jdbcClientDetailsServiceBuilder;
 
     public AuthServerConfiguration(AuthenticationManager authenticationManager,
                                    UserDetailsService userDetailsService,
@@ -54,7 +55,7 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
                                    AuthorizationCodeServices authorizationCodeServices,
                                    AuthTokenExceptionHandler authTokenExceptionHandler,
                                    AuthorizationServerTokenServices tokenService,
-                                   ClientDetailsServiceBuilder<MyJdbcClientDetailsServiceBuilder> jdbcClientDetailsServiceBuilder) {
+                                   ClientDetailsServiceBuilder<JdbcClientDetailsServiceBuilder> jdbcClientDetailsServiceBuilder) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
@@ -72,7 +73,7 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients
-                .configure(jdbcClientDetailsServiceBuilder);
+                .setBuilder(jdbcClientDetailsServiceBuilder);
     }
 
     @Override
@@ -80,7 +81,7 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
         security
                 //设置密码编辑器
                 .passwordEncoder(passwordEncoder)
-                .allowFormAuthenticationForClients()
+//                .allowFormAuthenticationForClients()
                 //开启 /oauth/token_key 的访问权限控制
                 .tokenKeyAccess("permitAll()")
                 //开启 /oauth/check_token 验证端口认证权限访问

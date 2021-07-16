@@ -26,7 +26,7 @@ public class DClientDetailsServiceImpl implements DClientDetailsService {
 
     @Override
     public Optional<MyClientDetails> findById(String clientId) {
-        return clientDetailsRepository.findById(clientId);
+        return clientDetailsRepository.findByClientId(clientId);
     }
 
     @Override

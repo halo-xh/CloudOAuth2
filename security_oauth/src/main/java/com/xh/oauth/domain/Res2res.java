@@ -1,6 +1,6 @@
 package com.xh.oauth.domain;
 
-import com.xh.oauth.utils.DeletedEnum;
+import com.xh.oauth.utils.YesOrNoEnum;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
@@ -40,7 +40,7 @@ public class Res2res {
     private Integer parentId;
 
     @Enumerated(EnumType.STRING)
-    private DeletedEnum deleted = DeletedEnum.NO;
+    private YesOrNoEnum deleted = YesOrNoEnum.NO;
 
     @CreatedDate
     private Date createDate;

@@ -2,7 +2,7 @@ package com.xh.oauth.token.service;
 
 import com.xh.oauth.token.entity.OAuthCode;
 import com.xh.oauth.token.repo.OAuthenticationStoreRepository;
-import com.xh.oauth.utils.DeletedEnum;
+import com.xh.oauth.utils.YesOrNoEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -34,7 +34,7 @@ public class OAuthenticationStoreServiceImpl implements OAuthenticationStoreServ
         boolean present = authStore.isPresent();
         if (present) {
             OAuthCode store = authStore.get();
-            store.setDeleted(DeletedEnum.YES);
+            store.setDeleted(YesOrNoEnum.YES);
             return authenticationStoreRepository.save(store);
         }
         return null;

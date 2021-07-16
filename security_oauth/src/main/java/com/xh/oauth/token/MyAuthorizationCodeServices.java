@@ -2,7 +2,7 @@ package com.xh.oauth.token;
 
 import com.xh.oauth.token.entity.OAuthCode;
 import com.xh.oauth.token.service.OAuthenticationStoreService;
-import com.xh.oauth.utils.DeletedEnum;
+import com.xh.oauth.utils.YesOrNoEnum;
 import com.xh.oauth.utils.SnowflakeIdWorker;
 import org.springframework.security.oauth2.common.exceptions.InvalidGrantException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -34,7 +34,7 @@ public class MyAuthorizationCodeServices implements AuthorizationCodeServices {
     public String createAuthorizationCode(OAuth2Authentication authentication) {
         String code = String.valueOf(idWorker.nextId());
         byte[] serialize = SerializationUtils.serialize(authentication);
-        OAuthCode authStore = new OAuthCode(code, serialize, DeletedEnum.NO);
+        OAuthCode authStore = new OAuthCode(code, serialize, YesOrNoEnum.NO);
         OAuthCode save = authenticationStoreService.save(authStore);
         return save.getCode();
     }
