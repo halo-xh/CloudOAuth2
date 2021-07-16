@@ -2,10 +2,8 @@ package com.xh.oauth.clients;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;
-import org.springframework.security.oauth2.config.annotation.builders.JdbcClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
-import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 import org.springframework.util.Assert;
 
 import javax.sql.DataSource;
@@ -19,7 +17,7 @@ import java.util.Set;
  */
 public class MyJdbcClientDetailsServiceBuilder extends ClientDetailsServiceBuilder<MyJdbcClientDetailsServiceBuilder> {
 
-    private Set<ClientDetails> clientDetails = new HashSet<>();
+    private Set<ClientDetails> clientDetails = new HashSet<>(); //?
 
     private DataSource dataSource;
 

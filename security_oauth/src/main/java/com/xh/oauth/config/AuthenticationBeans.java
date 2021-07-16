@@ -66,7 +66,7 @@ public class AuthenticationBeans {
     /**
      * Builder for OAuth2 client details service.
      */
-    @Bean(name = "JdbcClientDetailsServiceBuilder")
+    @Bean(name = "jdbcClientDetailsServiceBuilder")
     public ClientDetailsServiceBuilder<MyJdbcClientDetailsServiceBuilder>
     clientDetailsServiceBuilder(DataSource dataSource,
                                 MyClientDetailsService clientDetailsService) {
