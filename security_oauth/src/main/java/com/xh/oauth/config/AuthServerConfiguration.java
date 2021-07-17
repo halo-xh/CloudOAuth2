@@ -95,6 +95,7 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
         endpoints
                 //认证管理器
                 .authenticationManager(authenticationManager)
+                .pathMapping("/oauth/authorize", "/oauth2/authorize")
                 .tokenStore(tokenStore)
                 .approvalStore(approvalStore)
                 .tokenServices(tokenService)

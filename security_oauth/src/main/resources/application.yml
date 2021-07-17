@@ -5,7 +5,7 @@ spring:
   datasource:
     name: testerDS
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://localhost:3306/auth2?serverTimezone=GMT%2b8&useSSL=false
+    url: jdbc:mysql://localhost:3306/oauth_2?serverTimezone=GMT%2b8&useSSL=false
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver

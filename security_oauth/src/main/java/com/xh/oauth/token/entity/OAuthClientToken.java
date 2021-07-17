@@ -27,7 +27,7 @@ public class OAuthClientToken {
 
     @Lob
     @Basic(fetch = FetchType.EAGER)
-    @Column(name = "authentication", columnDefinition = "binary(1) DEFAULT NULL", nullable = true)
+    @Column(name = "authentication", columnDefinition = "binary(1) DEFAULT NULL")
     private byte[] authentication;
 
     @Column(name = "authentication_id", columnDefinition = "varchar(256) NOT NULL ", nullable = false)

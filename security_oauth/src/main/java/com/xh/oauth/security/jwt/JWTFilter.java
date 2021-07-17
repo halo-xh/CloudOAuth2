@@ -1,6 +1,7 @@
-package com.xh.oauth.jwt;
+package com.xh.oauth.security.jwt;
 
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import java.io.IOException;
  * Filters incoming requests and installs a Spring Security principal if a header corresponding to a valid user is
  * found.
  */
-//@Component
+@Component
 public class JWTFilter extends OncePerRequestFilter {
 
     public static final String BEARER_ = "Bearer ";
@@ -29,9 +30,9 @@ public class JWTFilter extends OncePerRequestFilter {
         String jwt = resolveToken(request);
         if (StringUtils.hasText(jwt)) {
             //todo. feign validate token.
-            Authentication authentication = null;
+            Authentication authentication = new UsernamePasswordAuthenticationToken(new Object(), new Object());
 //            feign.getAuthentication(jwt)
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request, response);

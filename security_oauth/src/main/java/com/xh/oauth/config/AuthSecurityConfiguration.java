@@ -1,6 +1,6 @@
 package com.xh.oauth.config;
 
-import com.xh.oauth.jwt.JWTFilter;
+import com.xh.oauth.security.jwt.JWTFilter;
 import com.xh.oauth.user.service.ExtUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,26 +28,30 @@ public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final ExtUserDetailsService userDetailService;
 
-//    private final JWTFilter jwtFilter;
+    private final JWTFilter jwtFilter;
 
     public AuthSecurityConfiguration(PasswordEncoder passwordEncoder,
-                                     ExtUserDetailsService userDetailService
-                                     ) {
+                                     ExtUserDetailsService userDetailService,
+                                     JWTFilter jwtFilter
+    ) {
         this.passwordEncoder = passwordEncoder;
         this.userDetailService = userDetailService;
-//        this.jwtFilter = jwtFilter;
+        this.jwtFilter = jwtFilter;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests().antMatchers("/oauth/**").permitAll()
+                .authorizeRequests().antMatchers(
+                "/oauth/**",
+                "/favicon.ico",
+                "/authenticate").permitAll()
                 .and()
                 .authorizeRequests().antMatchers(HttpMethod.TRACE, "**").denyAll()
-                .anyRequest().denyAll()
+                .anyRequest().authenticated()
                 .and()
                 .csrf().disable()
-//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .headers().frameOptions().sameOrigin()
                 .and()
                 .sessionManagement()
