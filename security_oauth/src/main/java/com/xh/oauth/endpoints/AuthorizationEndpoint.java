@@ -5,6 +5,7 @@ import com.xh.oauth.endpoints.request.FirstAuthorizationRequest;
 import com.xh.oauth.endpoints.response.AuthorizeResponse;
 import com.xh.oauth.exception.AuthTimeOutException;
 import com.xh.oauth.token.ClientTokenProvider;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,6 +21,7 @@ import org.springframework.security.oauth2.provider.code.AuthorizationCodeServic
 import org.springframework.security.oauth2.provider.endpoint.AbstractEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.FrameworkEndpoint;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestValidator;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -75,11 +77,14 @@ public class AuthorizationEndpoint extends AbstractEndpoint {
             oauth2RequestValidator.validateScope(authorizationRequest, client);
             // 保存此次请求信息
             String storedKey = storeAuthRequest(parameters);
+
             /* ====not login==== */
             if (authentication == null) {
                 return new AuthorizeResponse(false, storedKey, false);
             }
+
             /* ====already authenticated==== */
+
             // Some systems may allow for approval decisions to be remembered or approved by default. Check for
             // such logic here, and set the approved flag on the authorization request accordingly.
             authorizationRequest = userApprovalHandler.checkForPreApproval(authorizationRequest, authentication);
@@ -114,14 +119,33 @@ public class AuthorizationEndpoint extends AbstractEndpoint {
     @PostMapping(value = "/oauth2/authorize")
     public AuthorizeResponse authorize(@RequestBody AuthorizeRequest authorizeRequest) {
         String exchangeCode = authorizeRequest.getExchangeCode();
-        if (exchangeCode == null) {
+        if (!StringUtils.hasText(exchangeCode)) {
             throw new IllegalArgumentException("please provide exchange key.");
         }
         FirstAuthorizationRequest firstAuthorizationRequest = clientTokenProvider.validateToken(exchangeCode);
         if (firstAuthorizationRequest == null) {
             throw new AuthTimeOutException("authorize time out. please retry from original web side.");
         }
-
+        Authentication authentication = null;
+        try {
+            authentication = SecurityContextHolder.getContext().getAuthentication();
+        } catch (Exception e) {
+            logger.error("cannot get authentication.user haven't login...");
+        }
+        if (authentication == null) {
+            throw new AuthenticationCredentialsNotFoundException("login status time out, please retry.");
+        }
+        AuthorizationRequest authorizationRequest = new AuthorizationRequest();
+        // set val
+        authorizationRequest.setApproved(true);
+        authorizationRequest.setAuthorities();
+        if ("code".equals(firstAuthorizationRequest.getResponseType())) {
+            AuthorizeResponse authorizeResponse = new AuthorizeResponse(true, null, true);
+            String generateCode = generateCode(authorizationRequest, authentication);
+            authorizeResponse.setAuthorizeCode(generateCode);
+            authorizeResponse.setRedirectUrl(firstAuthorizationRequest.getRedirectUri());
+            return authorizeResponse;
+        }
         //todo. here 07-17
         return null;
     }
