@@ -7,6 +7,7 @@ import com.xh.oauth.exception.AuthTimeOutException;
 import com.xh.oauth.token.ClientTokenProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
@@ -21,8 +22,7 @@ import org.springframework.security.oauth2.provider.endpoint.FrameworkEndpoint;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestValidator;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * author  Xiao Hong
@@ -94,22 +94,22 @@ public class AuthorizationEndpoint extends AbstractEndpoint {
                 // 授权码模式 - 默认授权
                 if (responseTypes.contains("code")) {
                     AuthorizeResponse authorizeResponse = new AuthorizeResponse(true, null, true);
-                    authorizeResponse.setAuthorizeCode(generateCode(authorizationRequest, authentication));
+                    String generateCode = generateCode(authorizationRequest, authentication);
+                    authorizeResponse.setAuthorizeCode(generateCode);
                     authorizeResponse.setRedirectUrl(parameters.get(OAuth2Utils.REDIRECT_URI));
                     return authorizeResponse;
                 }
             }
-            // todo: read cache from redis that cached when init the service, for the authorities info should be stored in auth center server.
             AuthorizeResponse authorizeResponse = new AuthorizeResponse(true, storedKey, false);
-            authorizeResponse.set
-            return
+            authorizeResponse.setAuthorities(getAuthorities(client));
+            return authorizeResponse;
         } catch (RuntimeException e) {
             throw e;
         }
     }
 
     /**
-     * 授权操作
+     * 授权操作. 这个时候要拿着  echangecode(代表通过了上一步的client 验证) 进行操作。
      */
     @PostMapping(value = "/oauth2/authorize")
     public AuthorizeResponse authorize(@RequestBody AuthorizeRequest authorizeRequest) {
@@ -122,7 +122,8 @@ public class AuthorizationEndpoint extends AbstractEndpoint {
             throw new AuthTimeOutException("authorize time out. please retry from original web side.");
         }
 
-
+        //todo. here 07-17
+        return null;
     }
 
 
@@ -153,6 +154,16 @@ public class AuthorizationEndpoint extends AbstractEndpoint {
             }
             throw e;
         }
+    }
+
+    private List<String> getAuthorities(ClientDetails clientDetails) {
+        Collection<GrantedAuthority> authorities = clientDetails.getAuthorities();
+        ArrayList<String> arrayList = new ArrayList<>(authorities.size());
+        for (GrantedAuthority authority : authorities) {
+            String s = authority.getAuthority();
+            arrayList.add(s);
+        }
+        return arrayList;
     }
 
 }
