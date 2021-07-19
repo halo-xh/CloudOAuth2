@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.oauth2.common.util.OAuth2Utils;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -17,12 +18,16 @@ import java.util.concurrent.TimeUnit;
  * date  2021/7/17 14:26
  * description client 信息验证通过生成的临时token，用于用户通过验证时校验用。
  */
-
+@Component
 public class RedisClientTokenProvider implements ClientTokenProvider {
 
     private final Logger logger = LoggerFactory.getLogger(RedisClientTokenProvider.class);
 
-    private RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
+
+    public RedisClientTokenProvider(RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
     @Override
     public FirstAuthorizationRequest validateToken(String temTokenKey) {

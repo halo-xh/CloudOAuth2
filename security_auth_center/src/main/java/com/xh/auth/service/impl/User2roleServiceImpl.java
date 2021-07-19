@@ -25,7 +25,7 @@ public class User2roleServiceImpl implements User2roleService {
     }
 
     @Override
-    public List<User2role> findByUserId(Integer userId) {
+    public List<User2role> findByUserId(Long userId) {
         return user2RoleRepository.findAllByUserId(userId);
     }
 }

@@ -15,5 +15,5 @@ import java.util.List;
  */
 public interface User2roleService {
 
-    List<User2role> findByUserId(Integer userId);
+    List<User2role> findByUserId(Long userId);
 }

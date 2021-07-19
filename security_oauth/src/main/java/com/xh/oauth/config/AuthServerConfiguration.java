@@ -1,6 +1,5 @@
 package com.xh.oauth.config;
 
-import com.xh.oauth.clients.MyJdbcClientDetailsServiceBuilder;
 import com.xh.oauth.exception.AuthTokenExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +14,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.code.AuthorizationCodeTokenGranter;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 
@@ -47,6 +47,7 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
 
     private final ClientDetailsServiceBuilder<JdbcClientDetailsServiceBuilder> jdbcClientDetailsServiceBuilder;
 
+
     public AuthServerConfiguration(AuthenticationManager authenticationManager,
                                    UserDetailsService userDetailsService,
                                    PasswordEncoder passwordEncoder,
@@ -55,7 +56,8 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
                                    AuthorizationCodeServices authorizationCodeServices,
                                    AuthTokenExceptionHandler authTokenExceptionHandler,
                                    AuthorizationServerTokenServices tokenService,
-                                   ClientDetailsServiceBuilder<JdbcClientDetailsServiceBuilder> jdbcClientDetailsServiceBuilder) {
+                                   ClientDetailsServiceBuilder<JdbcClientDetailsServiceBuilder> jdbcClientDetailsServiceBuilder
+                                   ) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
@@ -95,7 +97,7 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
         endpoints
                 //认证管理器
                 .authenticationManager(authenticationManager)
-                .pathMapping("/oauth/authorize", "/oauth2/authorize")
+//                .pathMapping("/oauth/authorize", "/oauth2/authorize")
                 .tokenStore(tokenStore)
                 .approvalStore(approvalStore)
                 .tokenServices(tokenService)

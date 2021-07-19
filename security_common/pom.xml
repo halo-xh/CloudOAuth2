@@ -9,6 +9,8 @@
     </parent>
 
     <artifactId>security_common</artifactId>
+    <packaging>jar</packaging>
+    <version>${parent.version}</version>
 
     <properties>
         <java.version>1.8</java.version>
@@ -18,6 +20,11 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-openfeign-core</artifactId>
         </dependency>
     </dependencies>
 

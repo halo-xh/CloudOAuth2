@@ -19,4 +19,6 @@ public class FirstAuthorizationRequest {
 
     private String state;
 
+    private String scope;
+
 }

@@ -1,29 +1,35 @@
-package com.xh.auth.security;
+package com.xh.oauth2.config;
 
-import com.xh.auth.domain.SubjectLogin;
-import com.xh.auth.service.SubjectLoginService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.xh.common.domains.SubjectLogin;
+import com.xh.common.feign.AuthFeign;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+
 /**
- * Created by Xiao Hong on 2020-12-10
+ * @author xiaohong
+ * @version 1.0
+ * @date 2021/7/19 14:01
+ * @description
  */
 @Service
-public class MyUserDetailsService implements UserDetailsService {
+public class CustomUserDetailService implements UserDetailsService {
 
-    @Autowired
-    private SubjectLoginService subjectLoginService;
+    @Resource
+    private AuthFeign feign;
+
 
     @Override
-    public LoginUser loadUserByUsername(String username) throws UsernameNotFoundException {
-        SubjectLogin subjectLogin = subjectLoginService.selectByLoginName(username);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        SubjectLogin subjectLogin = feign.findByName(username);
         if (subjectLogin != null) {
             LoginUser loginUser = new LoginUser();
             loginUser.setLoginname(subjectLogin.getLoginName());
             loginUser.setPassword(subjectLogin.getPassword());
-            loginUser.setSid(1L);
+            loginUser.setSid(subjectLogin.getSid());
             loginUser.setStatus(subjectLogin.getStatus());
             return loginUser;
         } else {

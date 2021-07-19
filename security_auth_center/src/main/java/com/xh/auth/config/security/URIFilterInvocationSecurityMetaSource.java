@@ -40,6 +40,8 @@ public class URIFilterInvocationSecurityMetaSource implements FilterInvocationSe
         add("/swagger-resources/**"); //swagger
         add("/v2/api-docs");
         add("/swagger-ui.html");
+        // todo.
+        add("/api/subject/findByName");
     }};
 
     //    @Value("${app.config.security.permit-all}") todo.

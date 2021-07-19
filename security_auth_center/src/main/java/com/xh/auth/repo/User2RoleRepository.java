@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface User2RoleRepository extends JpaRepository<User2role, Long>, JpaSpecificationExecutor<User2role> {
 
-    List<User2role> findAllByUserId(Integer userId);
+    List<User2role> findAllByUserId(Long userId);
 
 }

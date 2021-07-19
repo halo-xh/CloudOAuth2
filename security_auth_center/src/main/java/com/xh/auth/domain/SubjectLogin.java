@@ -30,7 +30,7 @@ public class SubjectLogin {
     @GenericGenerator(
             name = "idCreator",
             strategy = "com.xh.common.utils.IdCreator")
-    private Integer sid;
+    private Long sid;
 
     @Column(unique = true, nullable = false)
     private String loginName;

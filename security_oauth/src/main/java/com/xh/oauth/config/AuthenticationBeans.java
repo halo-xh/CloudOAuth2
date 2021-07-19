@@ -22,9 +22,12 @@ import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.config.annotation.builders.JdbcClientDetailsServiceBuilder;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.OAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
+import org.springframework.security.oauth2.provider.code.AuthorizationCodeTokenGranter;
+import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -149,6 +152,20 @@ public class AuthenticationBeans {
         return defaultTokenServices;
     }
 
+    @Bean
+    public OAuth2RequestFactory oAuth2RequestFactory(ClientDetailsService clientDetailsService){
+        return new DefaultOAuth2RequestFactory(clientDetailsService);
+    }
+
+//    @Bean
+//    public AuthorizationCodeTokenGranter authorizationCodeTokenGranter(
+//            AuthorizationServerTokenServices authorizationServerTokenServices,
+//            AuthorizationCodeServices authorizationCodeServices,
+//            ClientDetailsService clientDetailsService,
+//            OAuth2RequestFactory requestFactory){
+//        return new AuthorizationCodeTokenGranter(
+//                authorizationServerTokenServices,authorizationCodeServices,clientDetailsService,requestFactory);
+//    }
 
 
 

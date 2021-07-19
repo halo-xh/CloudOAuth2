@@ -114,7 +114,7 @@ public class AuthorityService {
         return map;
     }
 
-    public Collection<GrantedAuthority> getGrantedAuthorityByLoginName(Integer userId) {
+    public Collection<GrantedAuthority> getGrantedAuthorityByLoginName(Long userId) {
         // get user role
         List<User2role> user2roleList = user2roleService.findByUserId(userId);//
         String roles = user2roleList.stream().map(User2role::getRoleName).map(String::valueOf).collect(Collectors.joining(","));

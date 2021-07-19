@@ -1,4 +1,4 @@
-package com.xh.auth.security;
+package com.xh.oauth2.config;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
