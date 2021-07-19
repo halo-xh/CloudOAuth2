@@ -34,18 +34,18 @@ public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests().antMatchers("/oauth/**","/oauth2/**").permitAll()
-                .and()
-                .authorizeRequests().antMatchers(HttpMethod.TRACE, "**").denyAll()
-                .and()
-                .authorizeRequests().anyRequest().authenticated()
-                .and()
-                .csrf().disable()
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .headers().frameOptions().sameOrigin()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            .authorizeRequests().antMatchers("/oauth/**","/oauth2/**").permitAll()
+        .and()
+            .authorizeRequests().antMatchers(HttpMethod.TRACE, "**").denyAll()
+        .and()
+            .authorizeRequests().anyRequest().authenticated()
+        .and()
+            .csrf().disable()
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .headers().frameOptions().sameOrigin()
+        .and()
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
