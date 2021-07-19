@@ -75,10 +75,16 @@
             </dependency>
 
 
-            <dependency>
+            <!--不可以用-->
+            <!--<dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-openfeign-core</artifactId>
-                <version>2.2.4.RELEASE</version>
+            </dependency>-->
+            <!--这个可以-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-feign</artifactId>
+                <version>1.4.4.RELEASE</version>
             </dependency>
 
             <dependency>
