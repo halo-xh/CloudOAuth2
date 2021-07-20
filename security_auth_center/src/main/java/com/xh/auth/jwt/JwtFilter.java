@@ -1,7 +1,8 @@
-package com.xh.oauth.security.jwt;
+package com.xh.auth.jwt;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -20,21 +21,24 @@ import java.io.IOException;
  * found.
  */
 @Component
-public class JWTFilter extends OncePerRequestFilter {
+public class JwtFilter extends OncePerRequestFilter {
+
 
     public static final String BEARER_ = "Bearer ";
 
+    private final TokenProvider tokenProvider;
+
+    public JwtFilter(TokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String jwt = resolveToken(request);
-        if (StringUtils.hasText(jwt)) {
-            //todo. feign validate token.
-            Authentication authentication = new UsernamePasswordAuthenticationToken(new Object(), new Object());
-//            feign.getAuthentication(jwt)
+        if (StringUtils.hasText(jwt) && this.tokenProvider.validateToken(jwt)) {
+            Authentication authentication = this.tokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
-
         filterChain.doFilter(request, response);
     }
 

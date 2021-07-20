@@ -7,6 +7,7 @@ import com.xh.oauth.exception.AuthTimeOutException;
 import com.xh.oauth.token.ClientTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -35,7 +36,8 @@ import java.util.stream.Collectors;
  * date  2021/7/17 12:44
  * description 授权码模式控制器 参考:{@link org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint}
  */
-//@Controller
+@RequestMapping("/oauth2")
+@RestController
 public class CustomAuthorizationEndpoint{
 
     private static final Logger logger = LoggerFactory.getLogger(CustomAuthorizationEndpoint.class);
@@ -63,7 +65,7 @@ public class CustomAuthorizationEndpoint{
     }
 
 
-    @GetMapping(value = "/oauth2/authorize")
+    @GetMapping(value = "/authorize")
     public AuthorizeResponse authorize(@RequestParam Map<String, String> parameters) {
         // 构建参数
         AuthorizationRequest authorizationRequest = oAuth2RequestFactory.createAuthorizationRequest(parameters);
@@ -93,7 +95,7 @@ public class CustomAuthorizationEndpoint{
         String storedKey = storeAuthRequest(parameters);
 
         /* ====not login==== */
-        if (authentication == null) {
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
             return new AuthorizeResponse(false, storedKey, false);
         }
 
@@ -127,7 +129,7 @@ public class CustomAuthorizationEndpoint{
     /**
      * 授权操作. 这个时候要拿着  echangecode(代表通过了上一步的client 验证) 进行操作。
      */
-    @PostMapping(value = "/oauth2/authorize")
+    @PostMapping(value = "/authorizer")
     public AuthorizeResponse authorize(@RequestBody AuthorizeRequest authorizeRequest) {
         String exchangeCode = authorizeRequest.getExchangeCode();
         if (!StringUtils.hasText(exchangeCode)) {

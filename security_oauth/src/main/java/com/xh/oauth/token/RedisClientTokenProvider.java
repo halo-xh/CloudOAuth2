@@ -1,8 +1,10 @@
 package com.xh.oauth.token;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xh.common.utils.JacksonUtils;
 import com.xh.oauth.endpoints.request.FirstAuthorizationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +37,9 @@ public class RedisClientTokenProvider implements ClientTokenProvider {
         if (val != null) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode rootNode = objectMapper.readTree(val);
-                return buildFirstAuthRequest(rootNode);
-            } catch (JsonProcessingException e) {
+                objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+                return JacksonUtils.deserialize(val,FirstAuthorizationRequest.class);
+            } catch (Exception e) {
                 logger.error("parse token from str error...");
                 e.printStackTrace();
             }
@@ -48,7 +50,8 @@ public class RedisClientTokenProvider implements ClientTokenProvider {
     @Override
     public String storeToken(FirstAuthorizationRequest authorizationRequest) {
         String randomKey = UUID.randomUUID().toString();
-        redisTemplate.opsForValue().set(randomKey, authorizationRequest.toString(), 30, TimeUnit.SECONDS);
+        String serialize = JacksonUtils.serialize(authorizationRequest);
+        redisTemplate.opsForValue().set(randomKey, serialize, 60, TimeUnit.SECONDS);
         return randomKey;
     }
 

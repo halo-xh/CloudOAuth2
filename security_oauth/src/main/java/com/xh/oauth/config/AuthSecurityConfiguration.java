@@ -1,7 +1,6 @@
 package com.xh.oauth.config;
 
-import com.xh.oauth.security.jwt.JWTFilter;
-import com.xh.oauth.user.service.ExtUserDetailsService;
+import com.xh.oauth.security.jwt.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,7 +10,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -25,9 +23,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 
-    private final JWTFilter jwtFilter;
+    private final JwtFilter jwtFilter;
 
-    public AuthSecurityConfiguration(JWTFilter jwtFilter) {
+    public AuthSecurityConfiguration(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
     }
 

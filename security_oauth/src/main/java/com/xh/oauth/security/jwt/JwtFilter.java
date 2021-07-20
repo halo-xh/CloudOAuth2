@@ -1,6 +1,10 @@
-package com.xh.auth.jwt;
+package com.xh.oauth.security.jwt;
 
+import com.xh.common.domains.SubjectLogin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -12,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collections;
 
 
 /**
@@ -19,31 +24,37 @@ import java.io.IOException;
  * found.
  */
 @Component
-public class JWTFilter extends OncePerRequestFilter {
+public class JwtFilter extends OncePerRequestFilter {
 
     public static final String BEARER_ = "Bearer ";
 
-    private final TokenProvider tokenProvider;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public JWTFilter(TokenProvider tokenProvider) {
-        this.tokenProvider = tokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
+
+    public JwtFilter(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String jwt = resolveToken(request);
-        if (StringUtils.hasText(jwt) && this.tokenProvider.validateToken(jwt)) {
-            Authentication authentication = this.tokenProvider.getAuthentication(jwt);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (StringUtils.hasText(jwt)) {
+            SubjectLogin subjectLogin = jwtTokenProvider.validateToken(jwt);
+            if (subjectLogin != null) {
+                String loginName = subjectLogin.getLoginName();
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginName, jwt, Collections.emptyList());
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+            logger.info("jwt token validate failed.. may token time out.");
         }
-
         filterChain.doFilter(request, response);
     }
 
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_)) {
-            return bearerToken.substring(7);
+            return bearerToken;
         }
         return null;
     }

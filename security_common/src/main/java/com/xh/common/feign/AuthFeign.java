@@ -17,4 +17,8 @@ public interface AuthFeign {
     @PostMapping("/api/subject/findByName")
     SubjectLogin findByName(@RequestBody String userName);
 
+
+    @PostMapping("/api/security/validateToken")
+    SubjectLogin validateToken(@RequestBody String token);
+
 }

@@ -30,7 +30,7 @@ public class Resources {
     @GenericGenerator(
             name = "idCreator",
             strategy = "com.xh.common.utils.IdCreator")
-    private Integer rid;
+    private Long rid;
 
     private String resName;
 

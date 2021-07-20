@@ -22,6 +22,7 @@ public class LoginTokenServiceImpl implements LoginTokenService {
         this.loginTokenRepository = loginTokenRepository;
     }
 
+    @Override
     public boolean existsUserToken(String username, String authToken) {
         LoginToken loginToken = loginTokenRepository.findByUserNameAndToken(username, authToken);
         return loginToken != null;
@@ -30,7 +31,9 @@ public class LoginTokenServiceImpl implements LoginTokenService {
     @Override
     public boolean delIfExistsUserSession(String username) {
         LoginToken loginToken = loginTokenRepository.findByUserName(username);
-        loginTokenRepository.delete(loginToken);
+        if (loginToken != null) {
+            loginTokenRepository.delete(loginToken);
+        }
         return true;
     }
 

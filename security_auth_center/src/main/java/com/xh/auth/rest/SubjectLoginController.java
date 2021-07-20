@@ -35,7 +35,9 @@ public class SubjectLoginController {
 
     private final LoginTokenService loginTokenService;
 
-    public SubjectLoginController(TokenProvider tokenProvider, AuthenticationManager authenticationManager, LoginTokenService loginTokenService) {
+    public SubjectLoginController(TokenProvider tokenProvider,
+                                  AuthenticationManager authenticationManager,
+                                  LoginTokenService loginTokenService) {
         this.tokenProvider = tokenProvider;
         this.authenticationManager = authenticationManager;
         this.loginTokenService = loginTokenService;

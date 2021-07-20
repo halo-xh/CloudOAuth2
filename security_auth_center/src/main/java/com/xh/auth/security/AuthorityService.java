@@ -74,7 +74,7 @@ public class AuthorityService {
         }
         // db config
         List<Resources> roleResList = resourcesService.findAllByResType(MyConstants.RES_TYPE_ROLE);
-        Map<Integer, String> roleMap = roleResList.stream().collect(Collectors.toMap(Resources::getRid, Resources::getResName));
+        Map<Long, String> roleMap = roleResList.stream().collect(Collectors.toMap(Resources::getRid, Resources::getResName));
         List<Res2res> res2resMapping = res2resService.findAll();
         HashMap<Integer, String> res2RoleMap = new HashMap<>();
         for (Res2res res2res : res2resMapping) {// api res mapping to role id
@@ -85,7 +85,7 @@ public class AuthorityService {
             }
         }
         for (Resources resources : apiResList) {
-            Integer apiResId = resources.getRid();
+            Long apiResId = resources.getRid();
             String path = resources.getPath();
             RequestMatcher matcher = apiPathResolver(path);
             String roles = res2RoleMap.get(apiResId);

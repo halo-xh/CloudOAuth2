@@ -1,6 +1,6 @@
 package com.xh.auth.config.security;
 
-import com.xh.auth.jwt.JWTFilter;
+import com.xh.auth.jwt.JwtFilter;
 import com.xh.auth.jwt.JwtAccessDeniedHandler;
 import com.xh.auth.jwt.JwtAuthenticationEntryPoint;
 import com.xh.auth.security.AuthorityService;
@@ -50,7 +50,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private FilterInvocationSecurityMetadataSource URIFilterInvocationSecurityMetaSource;
 
     @Autowired
-    private JWTFilter jwtFilter;
+    private JwtFilter jwtFilter;
 
     @Resource
     @Qualifier("logoutSuccessHandler")

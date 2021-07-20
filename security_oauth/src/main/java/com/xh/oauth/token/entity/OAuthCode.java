@@ -32,11 +32,11 @@ public class OAuthCode {
     }
 
     @Id
-    @GeneratedValue(generator = "idCreator",
-            strategy = GenerationType.SEQUENCE)
-    @GenericGenerator(
-            name = "idCreator",
-            strategy = "com.xh.oauth.utils.IdCreator")
+//    @GeneratedValue(generator = "idCreator",
+//            strategy = GenerationType.SEQUENCE)
+//    @GenericGenerator(
+//            name = "idCreator",
+//            strategy = "com.xh.oauth.utils.IdCreator")
     private String code;
 
     @Lob

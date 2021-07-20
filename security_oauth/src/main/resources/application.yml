@@ -2,6 +2,8 @@ server:
   port: 9091
 
 spring:
+  application:
+    name: security_oauth
   datasource:
     name: testerDS
     type: com.zaxxer.hikari.HikariDataSource
@@ -30,6 +32,25 @@ spring:
     properties:
       hibernate.jdbc.batch_size: 30
       hibernate.format_sql: true
+
+  cloud:
+    nacos:
+      config:
+        file-extension: yml
+        # set default group
+        group: APP_GROUP
+        prefix: ${spring.application.name}
+        # 在服务启动时自动拉取配置
+        enable-remote-sync-config: true
+        refresh-enabled: false
+        server-addr: 127.0.0.1:8848
+        namespace: ced8504b-967b-4e96-8d38-17f4349e4ab5
+      discovery:
+        register-enabled: true
+        server-addr: ${spring.cloud.nacos.config.server-addr}
+        namespace: ${spring.cloud.nacos.config.namespace}
+
+
 ---
 #spring:
 #  jpa:

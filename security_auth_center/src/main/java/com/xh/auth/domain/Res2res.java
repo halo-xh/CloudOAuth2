@@ -30,7 +30,7 @@ public class Res2res {
     @GenericGenerator(
             name = "idCreator",
             strategy = "com.xh.common.utils.IdCreator")
-    private Integer id;
+    private Long id;
 
     private Integer resId;
 
