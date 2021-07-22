@@ -22,18 +22,15 @@ public class OAuthClientTokenServiceImpl implements OAuthClientTokenService {
     }
 
 
-    @Override
-    public OAuthClientToken findByAuthId(String authId) {
-        return authClientTokenRepository.findByAuthenticationId(authId);
-    }
 
     @Override
     public void save(OAuthClientToken authClientToken) {
         authClientTokenRepository.save(authClientToken);
     }
 
+
     @Override
-    public void deleteByAuthenticationId(String authenticationId) {
-        authClientTokenRepository.deleteByAuthenticationId(authenticationId);
+    public boolean existsUserToken(Long requestId, String authToken) {
+        return authClientTokenRepository.findByRequestIdAndToken(requestId, authToken) != null;
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.A
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeTokenGranter;
@@ -24,8 +25,9 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
  * date  2021/7/13 23:41
  * description 授权服务配置类 {@link EnableAuthorizationServer}
  */
-@Configuration
-@EnableAuthorizationServer
+//@Configuration
+//@EnableAuthorizationServer
+//@Deprecated
 public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
 
@@ -43,8 +45,6 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
 
     private final AuthTokenExceptionHandler authTokenExceptionHandler;
 
-    private final AuthorizationServerTokenServices tokenService;
-
     private final ClientDetailsServiceBuilder<JdbcClientDetailsServiceBuilder> jdbcClientDetailsServiceBuilder;
 
 
@@ -55,7 +55,6 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
                                    TokenStore tokenStore,
                                    AuthorizationCodeServices authorizationCodeServices,
                                    AuthTokenExceptionHandler authTokenExceptionHandler,
-                                   AuthorizationServerTokenServices tokenService,
                                    ClientDetailsServiceBuilder<JdbcClientDetailsServiceBuilder> jdbcClientDetailsServiceBuilder
                                    ) {
         this.authenticationManager = authenticationManager;
@@ -65,7 +64,6 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
         this.tokenStore = tokenStore;
         this.authorizationCodeServices = authorizationCodeServices;
         this.authTokenExceptionHandler = authTokenExceptionHandler;
-        this.tokenService = tokenService;
         this.jdbcClientDetailsServiceBuilder = jdbcClientDetailsServiceBuilder;
     }
 
@@ -99,10 +97,9 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
                 .authenticationManager(authenticationManager)
                 .tokenStore(tokenStore)
                 .approvalStore(approvalStore)
-                .tokenServices(tokenService)
                 .authorizationCodeServices(authorizationCodeServices)
                 .userDetailsService(userDetailsService)
-                .pathMapping("/oauth/authorize", "/oauth2/authorize")
+//                .pathMapping("/oauth/authorize", "/oauth2/authorize")
                 .exceptionTranslator(authTokenExceptionHandler);
     }
 }

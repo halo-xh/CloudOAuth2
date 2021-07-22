@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author xiaohong
@@ -23,20 +26,23 @@ import javax.persistence.*;
 public class OAuthClientToken {
 
     @Id
-    private String tokenId;
+    private Long requestId;
 
-    @Lob
-    @Basic(fetch = FetchType.EAGER)
-    @Column(name = "authentication", columnDefinition = "binary(1) DEFAULT NULL")
-    private byte[] authentication;
-
-    @Column(name = "authentication_id", columnDefinition = "varchar(256) NOT NULL ", nullable = false)
-    private String authenticationId;
-
-    @Column(name = "user_name", columnDefinition = "varchar(256)")
-    private String userName;
-
-    @Column(name = "client_id", columnDefinition = "varchar(256)")
     private String clientId;
+
+    private String token;
+
+    private Date expireDate;
+
+    @CreatedDate
+    private Date createDate;
+
+    @Column
+    @LastModifiedDate
+    private Date updateDate;
+
+    @Version
+    @Column
+    private Integer version;
 
 }

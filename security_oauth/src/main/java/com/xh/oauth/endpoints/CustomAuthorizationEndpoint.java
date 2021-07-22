@@ -4,6 +4,7 @@ import com.xh.oauth.endpoints.request.AuthorizeRequest;
 import com.xh.oauth.endpoints.request.FirstAuthorizationRequest;
 import com.xh.oauth.endpoints.response.AuthorizeResponse;
 import com.xh.oauth.exception.AuthTimeOutException;
+import com.xh.oauth.security.authenticate.Oauth2Request;
 import com.xh.oauth.token.ClientTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,8 +37,8 @@ import java.util.stream.Collectors;
  * date  2021/7/17 12:44
  * description 授权码模式控制器 参考:{@link org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint}
  */
-@RequestMapping("/oauth2")
-@RestController
+//@RequestMapping("/oauth2")
+//@RestController
 public class CustomAuthorizationEndpoint{
 
     private static final Logger logger = LoggerFactory.getLogger(CustomAuthorizationEndpoint.class);
@@ -135,41 +136,41 @@ public class CustomAuthorizationEndpoint{
         if (!StringUtils.hasText(exchangeCode)) {
             throw new IllegalArgumentException("please provide exchange key.");
         }
-        FirstAuthorizationRequest firstAuthorizationRequest = clientTokenProvider.validateToken(exchangeCode);
-        if (firstAuthorizationRequest == null) {
-            throw new AuthTimeOutException("authorize time out. please retry from original web side.");
-        }
-        Authentication authentication = null;
-        try {
-            authentication = SecurityContextHolder.getContext().getAuthentication();
-        } catch (Exception e) {
-            logger.error("cannot get authentication.user haven't login...");
-        }
-        if (authentication == null) {
-            throw new AuthenticationCredentialsNotFoundException("login status time out, please retry.");
-        }
-        AuthorizationRequest authorizationRequest = new AuthorizationRequest();
-        // set val todo.
-        authorizationRequest.setApproved(true);
-        List<SimpleGrantedAuthority> grantedAuthorities = authorizeRequest.getGrantAuthorities().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-        authorizationRequest.setAuthorities(grantedAuthorities);
-        authorizationRequest.setClientId(firstAuthorizationRequest.getClientId());
-        authorizationRequest.setRedirectUri(firstAuthorizationRequest.getRedirectUri());
-        if ("code".equals(firstAuthorizationRequest.getResponseType())) {
-            AuthorizeResponse authorizeResponse = new AuthorizeResponse(true, null, true);
-            String generateCode = generateCode(authorizationRequest, authentication);
-            authorizeResponse.setAuthorizeCode(generateCode);
-            authorizeResponse.setRedirectUrl(firstAuthorizationRequest.getRedirectUri());
-            return authorizeResponse;
-        }
-        //todo. here 07-17
+        boolean b = clientTokenProvider.validateToken(exchangeCode);
+//        if (oauth2Request == null) {
+//            throw new AuthTimeOutException("authorize time out. please retry from original web side.");
+//        }
+//        Authentication authentication = null;
+//        try {
+//            authentication = SecurityContextHolder.getContext().getAuthentication();
+//        } catch (Exception e) {
+//            logger.error("cannot get authentication.user haven't login...");
+//        }
+//        if (authentication == null) {
+//            throw new AuthenticationCredentialsNotFoundException("login status time out, please retry.");
+//        }
+//        AuthorizationRequest authorizationRequest = new AuthorizationRequest();
+//        // set val todo.
+//        authorizationRequest.setApproved(true);
+//        List<SimpleGrantedAuthority> grantedAuthorities = authorizeRequest.getGrantAuthorities().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
+//        authorizationRequest.setAuthorities(grantedAuthorities);
+//        authorizationRequest.setClientId(oauth2Request.getClientId());
+//        authorizationRequest.setRedirectUri(oauth2Request.getRedirectUri());
+//        if ("code".equals(oauth2Request.getResponseType())) {
+//            AuthorizeResponse authorizeResponse = new AuthorizeResponse(true, null, true);
+//            String generateCode = generateCode(authorizationRequest, authentication);
+//            authorizeResponse.setAuthorizeCode(generateCode);
+//            authorizeResponse.setRedirectUrl(oauth2Request.getRedirectUri());
+//            return authorizeResponse;
+//        }
+//        //todo. here 07-17
         return null;
     }
 
 
     private String storeAuthRequest(Map<String, String> parameters) {
         FirstAuthorizationRequest firstAuthorizationRequest = buildFirstAuthRequest(parameters);
-        return clientTokenProvider.storeToken(firstAuthorizationRequest);
+        return "";//clientTokenProvider.storeToken(firstAuthorizationRequest);
     }
 
     private FirstAuthorizationRequest buildFirstAuthRequest(Map<String, String> parameters) {

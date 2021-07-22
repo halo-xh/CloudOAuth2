@@ -28,38 +28,25 @@ public class MyClientTokenService implements ClientTokenServices {
 
     @Override
     public OAuth2AccessToken getAccessToken(OAuth2ProtectedResourceDetails resource, Authentication authentication) {
-        String authId = keyGenerator.extractKey(resource, authentication);
-        OAuthClientToken authClientToken = oAuthClientTokenService.findByAuthId(authId);
-        if (authClientToken == null) {
-            return null;
-        }
-        byte[] tokenAuthentication = authClientToken.getAuthentication();
-        return SerializationUtils.deserialize(tokenAuthentication);
+//        String authId = keyGenerator.extractKey(resource, authentication);
+//        OAuthClientToken authClientToken = oAuthClientTokenService.findByAuthId(authId);
+//        if (authClientToken == null) {
+//            return null;
+//        }
+//        byte[] tokenAuthentication = authClientToken.getAuthentication();
+//        return SerializationUtils.deserialize(tokenAuthentication);
+        return null;
+
     }
 
 
     @Override
     public void saveAccessToken(OAuth2ProtectedResourceDetails resource, Authentication authentication, OAuth2AccessToken accessToken) {
-        removeAccessToken(resource, authentication);
-        String name = authentication == null ? null : authentication.getName();
-        String tokenId = accessToken.getValue();
-        byte[] serialize = SerializationUtils.serialize(accessToken);
-        String authenticationId = keyGenerator.extractKey(resource, authentication);
-        String clientId = resource.getClientId();
-        OAuthClientToken authClientToken = new OAuthClientToken();
-        authClientToken.setAuthentication(serialize);
-        authClientToken.setAuthenticationId(authenticationId);
-        authClientToken.setClientId(clientId);
-        authClientToken.setUserName(name);
-        authClientToken.setTokenId(tokenId);
-        oAuthClientTokenService.save(authClientToken);
 
     }
 
     @Override
     public void removeAccessToken(OAuth2ProtectedResourceDetails resource, Authentication authentication) {
-        String authenticationId = keyGenerator.extractKey(resource, authentication);
-        oAuthClientTokenService.deleteByAuthenticationId(authenticationId);
     }
 
 

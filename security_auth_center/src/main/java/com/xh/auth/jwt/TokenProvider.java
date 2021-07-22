@@ -39,13 +39,13 @@ public class TokenProvider {
     private final Logger log = LoggerFactory.getLogger(TokenProvider.class);
 
 
-    //    @Value("${app.config.jwt.key}") todo.
+    //    @Value("${app.config.filters.key}") todo.
     private String secret = "4BhYGpEnjaYZ446rDeRKhQofxZuHt13OPxd7FVUF9g5QWVtAVvZ8+ldGlxOLs36cVyLHebeE2XXs1/bjpv28iQ==";
 
-    //    @Value("${app.config.jwt.valid-second-rem}")
+    //    @Value("${app.config.filters.valid-second-rem}")
     private long tokenValidityInMillisecondsForRememberMe = 1000 * 3600L;
 
-    //    @Value("${app.config.jwt.valid-second}")
+    //    @Value("${app.config.filters.valid-second}")
     private long tokenValidityInMilliseconds = 1000 * 36000L;
 
     private Key key;

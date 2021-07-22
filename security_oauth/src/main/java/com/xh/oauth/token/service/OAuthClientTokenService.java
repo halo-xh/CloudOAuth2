@@ -11,10 +11,7 @@ import com.xh.oauth.token.entity.OAuthClientToken;
 public interface OAuthClientTokenService {
 
 
-    OAuthClientToken findByAuthId(String authId);
-
     void save(OAuthClientToken authClientToken);
 
-    void deleteByAuthenticationId(String authenticationId);
-
+    boolean existsUserToken(Long requestId, String authToken);
 }

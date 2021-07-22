@@ -15,8 +15,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.jwt.crypto.sign.MacSigner;
 import org.springframework.security.oauth2.config.annotation.builders.ClientDetailsServiceBuilder;
@@ -25,17 +28,21 @@ import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.OAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
+import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationManager;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeTokenGranter;
 import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestFactory;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * author  Xiao Hong
@@ -54,7 +61,7 @@ public class AuthenticationBeans {
      **/
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
     /**
@@ -136,41 +143,9 @@ public class AuthenticationBeans {
     }
 
     @Bean
-    @Primary
-    public AuthorizationServerTokenServices defaultTokenServices(TokenStore tokenStore,
-                                                                 JwtAccessTokenConverter jwtAccessTokenConverter,
-                                                                 @Qualifier("myClientDetailsService") ClientDetailsService clientDetailsService,
-                                                                 AuthenticationManager authenticationManager) {
-        DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-        defaultTokenServices.setSupportRefreshToken(true);
-        defaultTokenServices.setTokenStore(tokenStore);
-        defaultTokenServices.setTokenEnhancer(jwtAccessTokenConverter);
-        defaultTokenServices.setAccessTokenValiditySeconds(3600);
-        defaultTokenServices.setRefreshTokenValiditySeconds(7200);
-        defaultTokenServices.setClientDetailsService(clientDetailsService);
-        defaultTokenServices.setAuthenticationManager(authenticationManager);
-        return defaultTokenServices;
-    }
-
-    @Bean
     public OAuth2RequestFactory oAuth2RequestFactory(ClientDetailsService clientDetailsService){
         return new DefaultOAuth2RequestFactory(clientDetailsService);
     }
 
-//    @Bean
-//    public AuthorizationCodeTokenGranter authorizationCodeTokenGranter(
-//            AuthorizationServerTokenServices authorizationServerTokenServices,
-//            AuthorizationCodeServices authorizationCodeServices,
-//            ClientDetailsService clientDetailsService,
-//            OAuth2RequestFactory requestFactory){
-//        return new AuthorizationCodeTokenGranter(
-//                authorizationServerTokenServices,authorizationCodeServices,clientDetailsService,requestFactory);
-//    }
-
-
-
-    // ========================================================
-    // ======================USER AUTH CONFIG==================
-    // ========================================================
 
 }

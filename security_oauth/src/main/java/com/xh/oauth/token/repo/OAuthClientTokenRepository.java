@@ -13,7 +13,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 public interface OAuthClientTokenRepository extends JpaRepository<OAuthClientToken, String>, JpaSpecificationExecutor<OAuthClientToken> {
 
 
-    OAuthClientToken findByAuthenticationId(String authenticationId);
+    OAuthClientToken findByRequestIdAndToken(Long reqId,String token);
 
-    void deleteByAuthenticationId(String authenticationId);
 }

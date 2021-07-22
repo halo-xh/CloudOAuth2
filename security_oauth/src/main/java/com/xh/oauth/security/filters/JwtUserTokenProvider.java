@@ -1,4 +1,4 @@
-package com.xh.oauth.security.jwt;
+package com.xh.oauth.security.filters;
 
 import com.xh.common.domains.SubjectLogin;
 import com.xh.common.feign.AuthFeign;
@@ -14,17 +14,16 @@ import org.springframework.stereotype.Service;
  * @description
  */
 @Service
-public class JwtTokenProvider {
+public class JwtUserTokenProvider {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtUserTokenProvider.class);
 
 
     @Autowired
     private AuthFeign authFeign;
 
-
     public SubjectLogin validateToken(String jwt) {
-        logger.info("validate jwt token...");
+        logger.info("validate filters token...");
         return authFeign.validateToken(jwt);
     }
 

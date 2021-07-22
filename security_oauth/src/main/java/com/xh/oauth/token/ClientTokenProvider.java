@@ -1,11 +1,12 @@
 package com.xh.oauth.token;
 
-import com.xh.oauth.endpoints.request.FirstAuthorizationRequest;
+import com.xh.oauth.security.authenticate.Oauth2Request;
 
 public interface ClientTokenProvider {
 
-    FirstAuthorizationRequest validateToken(String temTokenKey);
+    boolean validateToken(String temTokenKey);
 
-    String storeToken(FirstAuthorizationRequest authorizationRequest);
+    Oauth2Request getPrincipal(String token);
 
+    Long createToken(Oauth2Request oauth2Request);
 }
