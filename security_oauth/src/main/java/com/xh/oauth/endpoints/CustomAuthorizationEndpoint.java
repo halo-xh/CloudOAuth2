@@ -37,8 +37,8 @@ import java.util.stream.Collectors;
  * date  2021/7/17 12:44
  * description 授权码模式控制器 参考:{@link org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint}
  */
-//@RequestMapping("/oauth2")
-//@RestController
+@RequestMapping("/oauth2")
+@RestController
 public class CustomAuthorizationEndpoint{
 
     private static final Logger logger = LoggerFactory.getLogger(CustomAuthorizationEndpoint.class);

@@ -36,21 +36,19 @@ public class ClientTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = resolveToken(request);
-        if (StringUtils.hasText(token)) {
-            SecurityContext securityContext = SecurityContextHolder.getContext();
-            if (clientTokenProvider.validateToken(token)) {
-                Oauth2Request principal = clientTokenProvider.getPrincipal(token);
-                ClientAuthentication clientAuthentication = new ClientAuthentication(principal, null);
-                Oauth2Authentication oauth2Authentication = new Oauth2Authentication(clientAuthentication, null);
-                securityContext.setAuthentication(oauth2Authentication);
-            } else {
-                logger.info("client validate failed.. may token time out. try create authentication from request info.");
-                //try create authentication from request info. help later authentication provider
-                ClientAuthentication clientAuthentication = attemptBuildClientAuthenticate(request);
-                SecurityContextHolder.clearContext();
-                if (clientAuthentication != null) {
-                    securityContext.setAuthentication(clientAuthentication);
-                }
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        if (StringUtils.hasText(token) && clientTokenProvider.validateToken(token)) {
+            Oauth2Request principal = clientTokenProvider.getPrincipal(token);
+            ClientAuthentication clientAuthentication = new ClientAuthentication(principal, null);
+            Oauth2Authentication oauth2Authentication = new Oauth2Authentication(clientAuthentication, null);
+            securityContext.setAuthentication(oauth2Authentication);
+        } else {
+            logger.info("client validate failed.. may token time out. try create authentication from request info.");
+            //try create authentication from request info. help later authentication provider
+            ClientAuthentication clientAuthentication = attemptBuildClientAuthenticate(request);
+            SecurityContextHolder.clearContext();
+            if (clientAuthentication != null) {
+                securityContext.setAuthentication(clientAuthentication);
             }
         }
         filterChain.doFilter(request, response);
@@ -60,8 +58,8 @@ public class ClientTokenFilter extends OncePerRequestFilter {
         Map<String, String[]> parameterMap = request.getParameterMap();
         try {
             Oauth2Request oauth2Request = buildAuthRequest(parameterMap);
-            return new ClientAuthentication(oauth2Request,parameterMap.get(CLIENT_SECRET)[0]);
-        }catch (Exception e){
+            return new ClientAuthentication(oauth2Request, parameterMap.get(CLIENT_SECRET)[0]);
+        } catch (Exception e) {
             logger.error("create client authentication failed..");
         }
         return null;
@@ -72,7 +70,7 @@ public class ClientTokenFilter extends OncePerRequestFilter {
         oauth2Request.setClientId(parameters.get(OAuth2Utils.CLIENT_ID)[0]);
         oauth2Request.setRedirectUri(parameters.get(OAuth2Utils.REDIRECT_URI)[0]);
         oauth2Request.setResponseType(parameters.get(OAuth2Utils.RESPONSE_TYPE)[0]);
-        oauth2Request.setState(parameters.get(OAuth2Utils.STATE)[0]);
+//        oauth2Request.setState(parameters.get(OAuth2Utils.STATE)[0]);
         oauth2Request.setScope(parameters.get(OAuth2Utils.SCOPE)[0]);
         return oauth2Request;
     }
