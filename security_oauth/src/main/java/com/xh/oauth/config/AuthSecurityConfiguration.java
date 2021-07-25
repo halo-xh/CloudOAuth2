@@ -77,7 +77,7 @@ public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected AuthenticationManager authenticationManager() throws Exception {
         List<AuthenticationProvider> providerList = new ArrayList<>();
         providerList.add(clientAuthenticationProvider());
-        providerList.add(clientAuthenticationProvider());
+        providerList.add(userAuthenticationProvider());
         ProviderManager authenticationManager = new ProviderManager(providerList);
         authenticationManager.setEraseCredentialsAfterAuthentication(true);
         return authenticationManager;

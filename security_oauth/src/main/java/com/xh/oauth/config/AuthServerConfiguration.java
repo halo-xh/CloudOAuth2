@@ -27,7 +27,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
  */
 //@Configuration
 //@EnableAuthorizationServer
-//@Deprecated
+@Deprecated
 public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
 
