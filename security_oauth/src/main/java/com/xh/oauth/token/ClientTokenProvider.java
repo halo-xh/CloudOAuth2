@@ -9,4 +9,6 @@ public interface ClientTokenProvider {
     Oauth2Request getPrincipal(String token);
 
     Long createToken(Oauth2Request oauth2Request);
+
+    String getCached(Long reqId);
 }

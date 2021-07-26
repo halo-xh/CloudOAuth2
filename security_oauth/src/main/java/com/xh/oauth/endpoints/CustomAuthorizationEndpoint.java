@@ -1,51 +1,46 @@
 package com.xh.oauth.endpoints;
 
+import com.xh.oauth.clients.entity.ClientDetails;
+import com.xh.oauth.clients.service.ClientDetailsService;
 import com.xh.oauth.endpoints.request.AuthorizeRequest;
-import com.xh.oauth.endpoints.request.FirstAuthorizationRequest;
+import com.xh.oauth.endpoints.request.AuthorizationRequest;
+import com.xh.oauth.endpoints.request.OAuth2Request;
+import com.xh.oauth.endpoints.request.OAuth2RequestFactory;
 import com.xh.oauth.endpoints.response.AuthorizeResponse;
-import com.xh.oauth.exception.AuthTimeOutException;
+import com.xh.oauth.exception.InvalidClientException;
+import com.xh.oauth.exception.OAuth2Exception;
+import com.xh.oauth.exception.UnauthorizedClientException;
+import com.xh.oauth.exception.UnsupportedResponseTypeException;
+import com.xh.oauth.security.authenticate.AuthorizationCodeServices;
+import com.xh.oauth.security.authenticate.ClientAuthentication;
+import com.xh.oauth.security.authenticate.Oauth2Authentication;
 import com.xh.oauth.security.authenticate.Oauth2Request;
 import com.xh.oauth.token.ClientTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.common.exceptions.InvalidClientException;
-import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
-import org.springframework.security.oauth2.common.exceptions.UnsupportedResponseTypeException;
-import org.springframework.security.oauth2.common.util.OAuth2Utils;
-import org.springframework.security.oauth2.provider.*;
-import org.springframework.security.oauth2.provider.approval.DefaultUserApprovalHandler;
-import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
-import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
-import org.springframework.security.oauth2.provider.endpoint.FrameworkEndpoint;
-import org.springframework.security.oauth2.provider.request.DefaultOAuth2RequestValidator;
-import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * author  Xiao Hong
  * date  2021/7/17 12:44
- * description 授权码模式控制器 参考:{@link org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint}
+ * description 授权码模式控制器 参考:{@link org.springframework.security.oauth2.provider.endpoint .AuthorizationEndpoint}
  */
 @RequestMapping("/oauth2")
 @RestController
-public class CustomAuthorizationEndpoint{
+public class CustomAuthorizationEndpoint {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomAuthorizationEndpoint.class);
-
-    private OAuth2RequestValidator oauth2RequestValidator = new DefaultOAuth2RequestValidator();
-
-    private UserApprovalHandler userApprovalHandler = new DefaultUserApprovalHandler();
 
     private final ClientTokenProvider clientTokenProvider;
 
@@ -67,64 +62,49 @@ public class CustomAuthorizationEndpoint{
 
 
     @GetMapping(value = "/authorize")
-    public AuthorizeResponse authorize(@RequestParam Map<String, String> parameters) {
+    public ResponseEntity<AuthorizeResponse> authorize(@RequestParam Map<String, String> parameters) {
         // 构建参数
         AuthorizationRequest authorizationRequest = oAuth2RequestFactory.createAuthorizationRequest(parameters);
-        // 获取response_type
-        Set<String> responseTypes = authorizationRequest.getResponseTypes();
-        // check
-        //获取response_type
-        if (!responseTypes.contains("token") && !responseTypes.contains("code")) {
-            throw new UnsupportedResponseTypeException("Unsupported response types: " + responseTypes);
-        }
-        // client id
-        if (authorizationRequest.getClientId() == null) {
-            throw new InvalidClientException("A client id must be provided");
-        }
         // 尝试获取 Authentication 判断是不是要进行验证
-        Authentication authentication = null;
+        Oauth2Authentication authentication = null;
         try {
-            authentication = SecurityContextHolder.getContext().getAuthentication();
+            Authentication au = SecurityContextHolder.getContext().getAuthentication();
+            if (au instanceof Oauth2Authentication) {
+                authentication = (Oauth2Authentication) au;
+            } else {
+                throw new UnauthorizedClientException("unauthorized");
+            }
         } catch (Exception e) {
-            logger.error("cannot get authentication.user haven't login...");
+            logger.error("cannot get authentication. user haven't login...");
+            throw new UnauthorizedClientException("unauthorized");
         }
-        ClientDetails client = clientDetailsService.loadClientByClientId(authorizationRequest.getClientId());
-        // We intentionally only validate the parameters requested by the client (ignoring any data that may have
-        // been added to the request by the manager).
-        oauth2RequestValidator.validateScope(authorizationRequest, client);
+        ClientAuthentication clientAuthentication = authentication.getClientAuthentication();
+        if (clientAuthentication == null) {
+            throw new UnauthorizedClientException("unauthorized");
+        }
         // 保存此次请求信息
-        String storedKey = storeAuthRequest(parameters);
-
-        /* ====not login==== */
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            return new AuthorizeResponse(false, storedKey, false);
+        String storedKey = storeAuthRequest(parameters, authentication);
+        Oauth2Request principal = (Oauth2Request) authentication.getPrincipal();
+        // set client passed header
+        Long requestId = principal.getRequestId();
+        String cachedToken = clientTokenProvider.getCached(requestId);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + cachedToken);
+        /* ==== user not login==== */
+        Authentication userAuthentication = authentication.getUserAuthentication();
+        if (userAuthentication == null) {
+            AuthorizeResponse authorizeResponse = new AuthorizeResponse(false, storedKey, false);
+            return new ResponseEntity<>(authorizeResponse, httpHeaders, HttpStatus.OK);
         }
-
-        /* ====already authenticated==== */
-
-        // Some systems may allow for approval decisions to be remembered or approved by default. Check for
-        // such logic here, and set the approved flag on the authorization request accordingly.
-        authorizationRequest = userApprovalHandler.checkForPreApproval(authorizationRequest, authentication);
-        // TODO: is this call necessary?
-        boolean approved = userApprovalHandler.isApproved(authorizationRequest, authentication);
-        authorizationRequest.setApproved(approved);
-        // Validation is all done, so we can check for auto approval...
-        if (authorizationRequest.isApproved()) {
-            if (responseTypes.contains("token")) {
-                // return getImplicitGrantResponse(authorizationRequest);
-            }
-            // 授权码模式 - 默认授权
-            if (responseTypes.contains("code")) {
-                AuthorizeResponse authorizeResponse = new AuthorizeResponse(true, null, true);
-                String generateCode = generateCode(authorizationRequest, authentication);
-                authorizeResponse.setAuthorizeCode(generateCode);
-                authorizeResponse.setRedirectUrl(parameters.get(OAuth2Utils.REDIRECT_URI));
-                return authorizeResponse;
-            }
-        }
+        /* ====user already authenticated==== */
+        Collection<? extends GrantedAuthority> authorities = userAuthentication.getAuthorities();
         AuthorizeResponse authorizeResponse = new AuthorizeResponse(true, storedKey, false);
-        authorizeResponse.setAuthorities(getAuthorities(client));
-        return authorizeResponse;
+        authorizeResponse.setAuthorities(getAuthorities(authorities));
+        return new ResponseEntity<>(authorizeResponse, httpHeaders, HttpStatus.OK);
+    }
+
+    private String storeAuthRequest(Map<String, String> parameters, Oauth2Authentication authentication) {
+        return null;
     }
 
     /**
@@ -136,54 +116,12 @@ public class CustomAuthorizationEndpoint{
         if (!StringUtils.hasText(exchangeCode)) {
             throw new IllegalArgumentException("please provide exchange key.");
         }
-        boolean b = clientTokenProvider.validateToken(exchangeCode);
-//        if (oauth2Request == null) {
-//            throw new AuthTimeOutException("authorize time out. please retry from original web side.");
-//        }
-//        Authentication authentication = null;
-//        try {
-//            authentication = SecurityContextHolder.getContext().getAuthentication();
-//        } catch (Exception e) {
-//            logger.error("cannot get authentication.user haven't login...");
-//        }
-//        if (authentication == null) {
-//            throw new AuthenticationCredentialsNotFoundException("login status time out, please retry.");
-//        }
-//        AuthorizationRequest authorizationRequest = new AuthorizationRequest();
-//        // set val todo.
-//        authorizationRequest.setApproved(true);
-//        List<SimpleGrantedAuthority> grantedAuthorities = authorizeRequest.getGrantAuthorities().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-//        authorizationRequest.setAuthorities(grantedAuthorities);
-//        authorizationRequest.setClientId(oauth2Request.getClientId());
-//        authorizationRequest.setRedirectUri(oauth2Request.getRedirectUri());
-//        if ("code".equals(oauth2Request.getResponseType())) {
-//            AuthorizeResponse authorizeResponse = new AuthorizeResponse(true, null, true);
-//            String generateCode = generateCode(authorizationRequest, authentication);
-//            authorizeResponse.setAuthorizeCode(generateCode);
-//            authorizeResponse.setRedirectUrl(oauth2Request.getRedirectUri());
-//            return authorizeResponse;
-//        }
 //        //todo. here 07-17
         return null;
     }
 
 
-    private String storeAuthRequest(Map<String, String> parameters) {
-        FirstAuthorizationRequest firstAuthorizationRequest = buildFirstAuthRequest(parameters);
-        return "";//clientTokenProvider.storeToken(firstAuthorizationRequest);
-    }
-
-    private FirstAuthorizationRequest buildFirstAuthRequest(Map<String, String> parameters) {
-        FirstAuthorizationRequest firstAuthorizationRequest = new FirstAuthorizationRequest();
-        firstAuthorizationRequest.setClientId(parameters.get(OAuth2Utils.CLIENT_ID));
-        firstAuthorizationRequest.setRedirectUri(parameters.get(OAuth2Utils.REDIRECT_URI));
-        firstAuthorizationRequest.setResponseType(parameters.get(OAuth2Utils.RESPONSE_TYPE));
-        firstAuthorizationRequest.setState(parameters.get(OAuth2Utils.STATE));
-        firstAuthorizationRequest.setScope(parameters.get(OAuth2Utils.SCOPE));
-        return firstAuthorizationRequest;
-    }
-
-
+    // after granted
     private String generateCode(AuthorizationRequest authorizationRequest, Authentication authentication)
             throws AuthenticationException {
         try {
@@ -198,8 +136,7 @@ public class CustomAuthorizationEndpoint{
         }
     }
 
-    private List<String> getAuthorities(ClientDetails clientDetails) {
-        Collection<GrantedAuthority> authorities = clientDetails.getAuthorities();
+    private List<String> getAuthorities(Collection<? extends GrantedAuthority> authorities) {
         ArrayList<String> arrayList = new ArrayList<>(authorities.size());
         for (GrantedAuthority authority : authorities) {
             String s = authority.getAuthority();

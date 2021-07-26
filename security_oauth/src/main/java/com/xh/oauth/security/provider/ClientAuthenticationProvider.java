@@ -1,5 +1,7 @@
 package com.xh.oauth.security.provider;
 
+import com.xh.oauth.clients.entity.ClientDetails;
+import com.xh.oauth.clients.service.ClientDetailsService;
 import com.xh.oauth.security.authenticate.ClientAuthentication;
 import com.xh.oauth.security.authenticate.Oauth2Request;
 import com.xh.oauth.token.ClientTokenProvider;
@@ -14,8 +16,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.provider.ClientDetails;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
 
 /**
  * Created by Xiao Hong on 2021-07-22

@@ -1,11 +1,14 @@
 package com.xh.oauth.clients;
 
+import com.xh.oauth.clients.entity.ClientDetails;
 import com.xh.oauth.clients.entity.MyClientDetails;
+import com.xh.oauth.clients.service.ClientDetailsService;
 import com.xh.oauth.clients.service.DClientDetailsService;
+import com.xh.oauth.exception.ClientAlreadyExistsException;
+import com.xh.oauth.exception.ClientRegistrationException;
+import com.xh.oauth.exception.NoSuchClientException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.provider.*;
-import org.springframework.security.oauth2.provider.client.JdbcClientDetailsService;
 
 import java.util.LinkedList;
 import java.util.List;

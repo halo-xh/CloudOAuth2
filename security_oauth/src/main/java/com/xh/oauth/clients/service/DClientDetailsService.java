@@ -1,7 +1,6 @@
 package com.xh.oauth.clients.service;
 
 import com.xh.oauth.clients.entity.MyClientDetails;
-import org.springframework.security.oauth2.provider.ClientDetails;
 
 import java.util.List;
 import java.util.Optional;

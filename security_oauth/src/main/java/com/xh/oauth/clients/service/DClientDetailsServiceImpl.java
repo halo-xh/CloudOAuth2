@@ -3,7 +3,6 @@ package com.xh.oauth.clients.service;
 import com.xh.oauth.clients.entity.MyClientDetails;
 import com.xh.oauth.clients.repo.MyClientDetailsRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -2,6 +2,8 @@ package com.xh.oauth.endpoints.request;
 
 import lombok.Data;
 
+import java.util.Set;
+
 /**
  * author  Xiao Hong
  * date  2021/7/17 15:12
@@ -9,11 +11,11 @@ import lombok.Data;
  * used to remember temporary.
  */
 @Data
-public class FirstAuthorizationRequest {
+public class AuthorizationRequest {
 
     private String clientId;
 
-    private String responseType;
+    private Set<String> responseType;
 
     private String redirectUri;
 

@@ -1,5 +1,6 @@
 package com.xh.oauth.config;
 
+import com.xh.oauth.clients.service.ClientDetailsService;
 import com.xh.oauth.security.filters.ClientTokenFilter;
 import com.xh.oauth.security.filters.JwtUserTokenFilter;
 import com.xh.oauth.security.provider.ClientAuthenticationProvider;
@@ -16,7 +17,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.ArrayList;

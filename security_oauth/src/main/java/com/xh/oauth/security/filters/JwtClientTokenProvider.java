@@ -1,11 +1,10 @@
 package com.xh.oauth.security.filters;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.xh.common.utils.JacksonUtils;
 import com.xh.common.utils.SnowflakeIdWorker;
-import com.xh.oauth.endpoints.request.FirstAuthorizationRequest;
 import com.xh.oauth.security.authenticate.Oauth2Request;
 import com.xh.oauth.token.ClientTokenProvider;
+import com.xh.oauth.token.TokenStore;
 import com.xh.oauth.token.entity.OAuthClientToken;
 import com.xh.oauth.token.service.OAuthClientTokenService;
 import com.xh.oauth.utils.RedisUtils;
@@ -16,7 +15,6 @@ import io.jsonwebtoken.security.SignatureException;
 import io.micrometer.core.instrument.util.JsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
@@ -35,16 +33,16 @@ public class JwtClientTokenProvider implements ClientTokenProvider {
 
     private final Logger log = LoggerFactory.getLogger(JwtClientTokenProvider.class);
 
-//    @Value("${app.config.jwt.key}")
-    private String secret ="4BhYGpEnjaYZ446rDeRKhQofxZuHt13OPxd7FVUF9g5QWVtAVvZ8+ldGlxOLs36cVyLHebeE2XXs1/bjpv28iQ==";
+    //    @Value("${app.config.jwt.key}")
+    private String secret = "4BhYGpEnjaYZ446rDeRKhQofxZuHt13OPxd7FVUF9g5QWVtAVvZ8+ldGlxOLs36cVyLHebeE2XXs1/bjpv28iQ==";
 
     private Key key;
 
-//    @Value("${app.config.jwt.valid-second-rem}")
+    //    @Value("${app.config.jwt.valid-second-rem}")
     private long tokenValiditySecondsForRememberMe = 300L;
 
-//    @Value("${app.config.jwt.valid-second}")
-    private long tokenValiditySeconds= 300L;
+    //    @Value("${app.config.jwt.valid-second}")
+    private long tokenValiditySeconds = 300L;
 
     private OAuthClientTokenService clientTokenService;
 
@@ -52,11 +50,13 @@ public class JwtClientTokenProvider implements ClientTokenProvider {
 
     private RedisUtils redisUtils;
 
+//    private TokenStore tokenStore; todo.
+
     @Override
     public boolean validateToken(String jwt) {
         try {
             Jws<Claims> jws = Jwts.parser().setSigningKey(key).parseClaimsJws(jwt);
-            return true;
+            return jws != null;
         } catch (SignatureException e) {
             log.info("Invalid JWT signature.");
         } catch (MalformedJwtException e) {
@@ -77,11 +77,19 @@ public class JwtClientTokenProvider implements ClientTokenProvider {
     public Oauth2Request getPrincipal(String token) {
         Claims claims = Jwts.parser().setSigningKey(key).parseClaimsJws(token).getBody();
         String subject = claims.getSubject();
-        return JacksonUtils.deserialize(subject,Oauth2Request.class);
+        return JacksonUtils.deserialize(subject, Oauth2Request.class);
     }
 
     @Override
     public Long createToken(Oauth2Request oauth2Request) {
+        Long requestId = oauth2Request.getRequestId();
+        if (requestId != null) {
+            // already created. use cache.
+            String val = redisUtils.getVal(String.valueOf(requestId));
+            if (val != null) {
+                return requestId;
+            }
+        }
         final long validity = System.currentTimeMillis() + this.tokenValiditySeconds;
         long id = idWorker.nextId();
         String jwtToken = buildToken(oauth2Request, new Date(validity), id);
@@ -93,6 +101,11 @@ public class JwtClientTokenProvider implements ClientTokenProvider {
         clientTokenService.save(clientToken);
         redisUtils.set(String.valueOf(id), jwtToken, validity);
         return id;
+    }
+
+    @Override
+    public String getCached(Long reqId) {
+        return redisUtils.getVal(String.valueOf(reqId));
     }
 
 
