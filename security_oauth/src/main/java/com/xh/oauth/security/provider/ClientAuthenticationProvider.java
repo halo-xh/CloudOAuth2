@@ -5,7 +5,7 @@ import com.xh.oauth.clients.service.ClientDetailsService;
 import com.xh.oauth.security.authenticate.ClientAuthentication;
 import com.xh.oauth.security.authenticate.Oauth2Authentication;
 import com.xh.oauth.security.authenticate.Oauth2Request;
-import com.xh.oauth.token.ClientTokenProvider;
+import com.xh.oauth.token.provider.ClientTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -53,9 +53,11 @@ public class ClientAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        Oauth2Request principal = (Oauth2Request) authentication.getPrincipal();
-        Object credentials = authentication.getCredentials();
-        ClientDetails clientDetails = retrieveClient(principal.getClientId(), authentication);
+        Oauth2Authentication auth = (Oauth2Authentication) authentication;
+        ClientAuthentication clientAuthentication = auth.getClientAuthentication();
+        Oauth2Request principal = (Oauth2Request) clientAuthentication.getPrincipal();
+        Object credentials = clientAuthentication.getCredentials();
+        ClientDetails clientDetails = retrieveClient(principal.getClientId(), clientAuthentication);
         if (!matchCredentials(credentials, clientDetails)) {
             throw new BadCredentialsException(messages.getMessage(
                     "ClientAuthenticationProvider.badCredentials", "Bad credentials"));
@@ -125,7 +127,7 @@ public class ClientAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return ClientAuthentication.class.isAssignableFrom(authentication);
+        return Oauth2Authentication.class.isAssignableFrom(authentication);
     }
 
     public void setClientDetailsService(ClientDetailsService clientDetailsService) {

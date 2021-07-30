@@ -1,4 +1,4 @@
-package com.xh.oauth.token;
+package com.xh.oauth.token.provider;
 
 import com.xh.oauth.security.authenticate.Oauth2Request;
 

@@ -23,16 +23,14 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         Oauth2Authentication oauth2Authentication = (Oauth2Authentication) authentication;
-        ClientAuthentication clientAuthentication = oauth2Authentication.getClientAuthentication();
         // does not pass client authentication, fast fail.
-        if (clientAuthentication == null) {
+        if (!oauth2Authentication.isClientAuthenticated()) {
             logger.info("does not pass client authentication, fast fail.");
             return null;
         }
-        Authentication userAuthentication = oauth2Authentication.getUserAuthentication();
         // haven't login(parse from jwt token), fast fail.
         Oauth2Authentication aNew = ((Oauth2Authentication) authentication).createNew();
-        if (userAuthentication == null) {
+        if (!oauth2Authentication.isUserAuthenticated()) {
             logger.info("user haven't login(parse from jwt token), fast fail.");
             return aNew;
         }

@@ -1,4 +1,4 @@
-package com.xh.oauth.security.filters;
+package com.xh.oauth.token.provider;
 
 import com.xh.common.domains.SubjectLogin;
 import com.xh.common.feign.AuthFeign;

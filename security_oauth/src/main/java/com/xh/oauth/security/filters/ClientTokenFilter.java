@@ -3,7 +3,7 @@ package com.xh.oauth.security.filters;
 import com.xh.oauth.security.authenticate.ClientAuthentication;
 import com.xh.oauth.security.authenticate.Oauth2Authentication;
 import com.xh.oauth.security.authenticate.Oauth2Request;
-import com.xh.oauth.token.ClientTokenProvider;
+import com.xh.oauth.token.provider.ClientTokenProvider;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,7 +47,8 @@ public class ClientTokenFilter extends OncePerRequestFilter {
             ClientAuthentication clientAuthentication = attemptBuildClientAuthenticate(request);
             SecurityContextHolder.clearContext();
             if (clientAuthentication != null) {
-                securityContext.setAuthentication(clientAuthentication);
+                Oauth2Authentication oauth2Authentication = new Oauth2Authentication(clientAuthentication, null);
+                securityContext.setAuthentication(oauth2Authentication);
                 logger.info("client authenticated from url parameters.");
             }
         }

@@ -2,6 +2,7 @@ package com.xh.oauth.security.filters;
 
 import com.xh.common.domains.SubjectLogin;
 import com.xh.oauth.security.authenticate.Oauth2Authentication;
+import com.xh.oauth.token.provider.JwtUserTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;

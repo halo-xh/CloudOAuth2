@@ -5,7 +5,7 @@ import com.xh.oauth.security.filters.ClientTokenFilter;
 import com.xh.oauth.security.filters.JwtUserTokenFilter;
 import com.xh.oauth.security.provider.ClientAuthenticationProvider;
 import com.xh.oauth.security.provider.UserAuthenticationProvider;
-import com.xh.oauth.token.ClientTokenProvider;
+import com.xh.oauth.token.provider.ClientTokenProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -87,7 +87,6 @@ public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return authenticationManager;
     }
 
-    @Bean
     public ClientAuthenticationProvider clientAuthenticationProvider() {
         ClientAuthenticationProvider clientAuthenticationProvider = new ClientAuthenticationProvider();
         clientAuthenticationProvider.setClientDetailsService(clientDetailsService);
@@ -96,7 +95,6 @@ public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return clientAuthenticationProvider;
     }
 
-    @Bean
     public UserAuthenticationProvider userAuthenticationProvider() {
         return new UserAuthenticationProvider();
     }

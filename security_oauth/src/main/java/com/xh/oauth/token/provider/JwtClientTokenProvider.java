@@ -1,10 +1,8 @@
-package com.xh.oauth.security.filters;
+package com.xh.oauth.token.provider;
 
 import com.xh.common.utils.JacksonUtils;
 import com.xh.common.utils.SnowflakeIdWorker;
 import com.xh.oauth.security.authenticate.Oauth2Request;
-import com.xh.oauth.token.ClientTokenProvider;
-import com.xh.oauth.token.TokenStore;
 import com.xh.oauth.token.entity.OAuthClientToken;
 import com.xh.oauth.token.service.OAuthClientTokenService;
 import com.xh.oauth.utils.RedisUtils;
