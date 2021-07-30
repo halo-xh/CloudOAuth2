@@ -30,6 +30,7 @@ public class OAuthClientToken {
 
     private String clientId;
 
+    @Column(name = "token", columnDefinition = "varchar(2048)")
     private String token;
 
     private Date expireDate;

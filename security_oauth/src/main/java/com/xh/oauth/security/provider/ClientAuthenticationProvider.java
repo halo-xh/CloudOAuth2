@@ -55,6 +55,10 @@ public class ClientAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         Oauth2Authentication auth = (Oauth2Authentication) authentication;
         ClientAuthentication clientAuthentication = auth.getClientAuthentication();
+        if (clientAuthentication.isAuthenticated()) {
+            // already auth by jwt.
+            return clientAuthentication;
+        }
         Oauth2Request principal = (Oauth2Request) clientAuthentication.getPrincipal();
         Object credentials = clientAuthentication.getCredentials();
         ClientDetails clientDetails = retrieveClient(principal.getClientId(), clientAuthentication);

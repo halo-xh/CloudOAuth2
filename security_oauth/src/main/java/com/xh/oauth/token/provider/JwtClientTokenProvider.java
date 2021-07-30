@@ -12,7 +12,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -41,10 +41,12 @@ public class JwtClientTokenProvider implements ClientTokenProvider {
     //    @Value("${app.config.jwt.valid-second}")
     private long tokenValiditySeconds = 300L;
 
+    @Autowired
     private OAuthClientTokenService clientTokenService;
 
-    private SnowflakeIdWorker idWorker;
+    private final SnowflakeIdWorker idWorker = new SnowflakeIdWorker(3,7);
 
+    @Autowired
     private RedisUtils redisUtils;
 
 //    private TokenStore tokenStore; todo.
@@ -65,7 +67,6 @@ public class JwtClientTokenProvider implements ClientTokenProvider {
         } catch (IllegalArgumentException e) {
             log.info("JWT token compact of handler are invalid.");
         }
-        SecurityContextHolder.clearContext();
         return false;
     }
 
@@ -87,7 +88,7 @@ public class JwtClientTokenProvider implements ClientTokenProvider {
                 return requestId;
             }
         }
-        final long validity = System.currentTimeMillis() + this.tokenValiditySeconds;
+        final long validity = System.currentTimeMillis() + this.tokenValiditySeconds*1000;
         long id = idWorker.nextId();
         String jwtToken = buildToken(oauth2Request, new Date(validity), id);
         OAuthClientToken clientToken = new OAuthClientToken();

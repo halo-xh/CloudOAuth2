@@ -1,6 +1,7 @@
 package com.xh.oauth.security.filters;
 
 import com.xh.common.domains.SubjectLogin;
+import com.xh.oauth.exception.OAuth2Exception;
 import com.xh.oauth.security.authenticate.Oauth2Authentication;
 import com.xh.oauth.token.provider.JwtUserTokenProvider;
 import org.slf4j.Logger;
@@ -44,7 +45,13 @@ public class JwtUserTokenFilter extends OncePerRequestFilter {
         if (authentication != null) {
             String jwt = resolveToken(request);
             if (StringUtils.hasText(jwt)) {
-                SubjectLogin subjectLogin = jwtUserTokenProvider.validateToken(jwt);
+                SubjectLogin subjectLogin = null;
+                try {
+                    subjectLogin = jwtUserTokenProvider.validateToken(jwt);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new OAuth2Exception("authenticate user failed", e);
+                }
                 if (subjectLogin != null) {
                     UsernamePasswordAuthenticationToken userAuth = new UsernamePasswordAuthenticationToken(subjectLogin, "", null);
                     authentication.setUserAuthentication(userAuth);
@@ -60,7 +67,7 @@ public class JwtUserTokenFilter extends OncePerRequestFilter {
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_)) {
-            return bearerToken;
+            return bearerToken.substring(7);
         }
         return null;
     }

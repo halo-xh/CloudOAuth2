@@ -33,7 +33,7 @@ public class SecurityController {
     @AnonymousAccess
     @PostMapping("/validateToken")
     public SubjectLogin getSubjectLogin(@RequestBody String token){
-        Authentication authentication = tokenProvider.getAuthentication(token.substring(7));
+        Authentication authentication = tokenProvider.getAuthentication(token);
         User user = (User) authentication.getPrincipal();
         String username = user.getUsername();
         return subjectLoginService.selectByLoginName(username);

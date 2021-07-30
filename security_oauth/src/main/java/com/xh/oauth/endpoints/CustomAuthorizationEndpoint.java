@@ -84,7 +84,7 @@ public class CustomAuthorizationEndpoint {
         Long requestId = principal.getRequestId();
         String cachedToken = clientTokenProvider.getCached(requestId);
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer " + cachedToken);
+        httpHeaders.add(HttpHeaders.WWW_AUTHENTICATE, "Bearer " + cachedToken);
         /* ==== user not login==== */
         Authentication userAuthentication = authentication.getUserAuthentication();
         if (userAuthentication == null) {

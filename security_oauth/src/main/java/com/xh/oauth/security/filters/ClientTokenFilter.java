@@ -4,6 +4,7 @@ import com.xh.oauth.security.authenticate.ClientAuthentication;
 import com.xh.oauth.security.authenticate.Oauth2Authentication;
 import com.xh.oauth.security.authenticate.Oauth2Request;
 import com.xh.oauth.token.provider.ClientTokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +29,8 @@ import java.util.Map;
 public class ClientTokenFilter extends OncePerRequestFilter {
 
     public static final String CLIENT_SECRET = "client_secret";
+
+    @Autowired
     private ClientTokenProvider clientTokenProvider;
 
     public static final String BEARER_ = "Bearer ";
@@ -39,13 +42,13 @@ public class ClientTokenFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token) && clientTokenProvider.validateToken(token)) {
             Oauth2Request principal = clientTokenProvider.getPrincipal(token);
             ClientAuthentication clientAuthentication = new ClientAuthentication(principal, null);
+            clientAuthentication.setAuthenticated(Boolean.TRUE);
             Oauth2Authentication oauth2Authentication = new Oauth2Authentication(clientAuthentication, null);
             securityContext.setAuthentication(oauth2Authentication);
         } else {
-            logger.info("client validate failed.. may token time out. try create authentication from request info.");
+            logger.info("client validate failed.. try create authentication from request info.");
             //try create authentication from request info. help later authentication provider
             ClientAuthentication clientAuthentication = attemptBuildClientAuthenticate(request);
-//            SecurityContextHolder.clearContext();
             if (clientAuthentication != null) {
                 Oauth2Authentication oauth2Authentication = new Oauth2Authentication(clientAuthentication, null);
                 securityContext.setAuthentication(oauth2Authentication);
@@ -79,7 +82,7 @@ public class ClientTokenFilter extends OncePerRequestFilter {
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(HttpHeaders.WWW_AUTHENTICATE);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_)) {
-            return bearerToken;
+            return bearerToken.substring(BEARER_.length());
         }
         return null;
     }
