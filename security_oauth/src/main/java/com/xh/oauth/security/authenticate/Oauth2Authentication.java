@@ -24,12 +24,12 @@ public class Oauth2Authentication extends AbstractAuthenticationToken {
 
     @Override
     public Object getCredentials() {
-        return null;
+        return clientAuthentication.getCredentials();
     }
 
     @Override
     public Object getPrincipal() {
-        return null;
+        return clientAuthentication.getPrincipal();
     }
 
     public boolean isUserAuthenticated() {

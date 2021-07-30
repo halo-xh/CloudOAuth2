@@ -75,9 +75,8 @@ public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
-    @Bean
     @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
+    public AuthenticationManager authenticationManager() throws Exception {
         List<AuthenticationProvider> providerList = new ArrayList<>();
         providerList.add(clientAuthenticationProvider());
         providerList.add(userAuthenticationProvider());
@@ -87,6 +86,13 @@ public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return authenticationManager;
     }
 
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Bean
     public ClientAuthenticationProvider clientAuthenticationProvider() {
         ClientAuthenticationProvider clientAuthenticationProvider = new ClientAuthenticationProvider();
         clientAuthenticationProvider.setClientDetailsService(clientDetailsService);
@@ -95,6 +101,7 @@ public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return clientAuthenticationProvider;
     }
 
+    @Bean
     public UserAuthenticationProvider userAuthenticationProvider() {
         return new UserAuthenticationProvider();
     }

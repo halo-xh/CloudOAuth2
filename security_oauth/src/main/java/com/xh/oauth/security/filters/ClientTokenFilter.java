@@ -45,7 +45,7 @@ public class ClientTokenFilter extends OncePerRequestFilter {
             logger.info("client validate failed.. may token time out. try create authentication from request info.");
             //try create authentication from request info. help later authentication provider
             ClientAuthentication clientAuthentication = attemptBuildClientAuthenticate(request);
-            SecurityContextHolder.clearContext();
+//            SecurityContextHolder.clearContext();
             if (clientAuthentication != null) {
                 Oauth2Authentication oauth2Authentication = new Oauth2Authentication(clientAuthentication, null);
                 securityContext.setAuthentication(oauth2Authentication);
