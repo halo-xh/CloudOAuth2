@@ -47,6 +47,7 @@ public class JwtUserTokenFilter extends OncePerRequestFilter {
                 if (subjectLogin != null) {
                     UsernamePasswordAuthenticationToken userAuth = new UsernamePasswordAuthenticationToken(subjectLogin, "", null);
                     authentication.setUserAuthentication(userAuth);
+                    securityContext.setAuthentication(authentication);
                 }else {
                     logger.info("user jwt token validate failed.. may token time out.");
                 }

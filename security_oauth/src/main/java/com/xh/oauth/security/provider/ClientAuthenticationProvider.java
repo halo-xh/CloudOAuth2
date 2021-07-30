@@ -3,6 +3,7 @@ package com.xh.oauth.security.provider;
 import com.xh.oauth.clients.entity.ClientDetails;
 import com.xh.oauth.clients.service.ClientDetailsService;
 import com.xh.oauth.security.authenticate.ClientAuthentication;
+import com.xh.oauth.security.authenticate.Oauth2Authentication;
 import com.xh.oauth.security.authenticate.Oauth2Request;
 import com.xh.oauth.token.ClientTokenProvider;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.springframework.security.authentication.InternalAuthenticationService
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.SpringSecurityMessageSource;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -61,7 +63,9 @@ public class ClientAuthenticationProvider implements AuthenticationProvider {
         Long tokenId = clientTokenProvider.createToken(principal);
         principal.setRequestId(tokenId);
         logger.info("passed client authenticate...");
-        return createSuccessAuthentication(principal);
+        Authentication successAuthentication = createSuccessAuthentication(principal);
+        SecurityContextHolder.getContext().setAuthentication(successAuthentication);
+        return successAuthentication;
     }
 
     private boolean matchCredentials(Object credentials, ClientDetails clientDetails) {
@@ -82,8 +86,9 @@ public class ClientAuthenticationProvider implements AuthenticationProvider {
     }
 
 
-    private ClientAuthentication createSuccessAuthentication(Oauth2Request principal) {
-        return new ClientAuthentication(principal, null);
+    private Authentication createSuccessAuthentication(Oauth2Request principal) {
+        ClientAuthentication clientAuthentication = new ClientAuthentication(principal, null);
+        return new Oauth2Authentication(clientAuthentication, null);
     }
 
     private ClientDetails retrieveClient(String clientId, Authentication authentication) throws AuthenticationException {

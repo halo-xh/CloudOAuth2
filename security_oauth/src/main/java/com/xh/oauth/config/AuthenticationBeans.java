@@ -2,6 +2,7 @@ package com.xh.oauth.config;
 
 import com.xh.oauth.clients.MyClientDetailsService;
 import com.xh.oauth.clients.service.DClientDetailsService;
+import com.xh.oauth.endpoints.request.OAuth2RequestFactory;
 import com.xh.oauth.exception.AuthClientExceptionHandler;
 import com.xh.oauth.token.MyAuthorizationCodeServices;
 import com.xh.oauth.token.service.OAuthenticationStoreService;
@@ -56,6 +57,11 @@ public class AuthenticationBeans {
     @Bean
     public AuthClientExceptionHandler authClientExceptionHandler() {
         return new AuthClientExceptionHandler();
+    }
+
+    @Bean
+    public OAuth2RequestFactory auth2RequestFactory(){
+        return new OAuth2RequestFactory();
     }
 
 //    /**

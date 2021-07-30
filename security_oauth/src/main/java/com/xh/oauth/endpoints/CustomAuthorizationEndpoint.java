@@ -122,15 +122,14 @@ public class CustomAuthorizationEndpoint {
 
 
     // after granted
-    private String generateCode(AuthorizationRequest authorizationRequest, Authentication authentication)
+    private String generateCode(AuthorizationRequest request, Oauth2Authentication authentication)
             throws AuthenticationException {
         try {
-            OAuth2Request storedOAuth2Request = oAuth2RequestFactory.createOAuth2Request(authorizationRequest);
-            OAuth2Authentication combinedAuth = new OAuth2Authentication(storedOAuth2Request, authentication);
+            Oauth2Authentication combinedAuth = authentication.createNew();
             return authorizationCodeServices.createAuthorizationCode(combinedAuth);
         } catch (OAuth2Exception e) {
-            if (authorizationRequest.getState() != null) {
-                e.addAdditionalInformation("state", authorizationRequest.getState());
+            if (request.getState() != null) {
+                e.addAdditionalInformation("state", request.getState());
             }
             throw e;
         }

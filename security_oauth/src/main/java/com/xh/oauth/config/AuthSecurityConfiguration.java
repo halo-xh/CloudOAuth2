@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -58,11 +59,12 @@ public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .authorizeRequests().antMatchers("/oauth/**", "/oauth2/**").permitAll()
-                .and()
+//                .authorizeRequests().antMatchers("/oauth/**", "/oauth2/**").permitAll()
+//                .and()
                 .authorizeRequests().antMatchers(HttpMethod.TRACE, "**").denyAll()
-                .and()
-                .authorizeRequests().anyRequest().authenticated()
+//                .and()
+//                .authorizeRequests()
+                .anyRequest().authenticated()
                 .and()
                 .csrf().disable()
                 .addFilterBefore(jwtUserTokenFilter, UsernamePasswordAuthenticationFilter.class)
@@ -73,13 +75,15 @@ public class AuthSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
+    @Bean
     @Override
-    protected AuthenticationManager authenticationManager() throws Exception {
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         List<AuthenticationProvider> providerList = new ArrayList<>();
         providerList.add(clientAuthenticationProvider());
         providerList.add(userAuthenticationProvider());
         ProviderManager authenticationManager = new ProviderManager(providerList);
         authenticationManager.setEraseCredentialsAfterAuthentication(true);
+        authenticationManager.setAuthenticationEventPublisher(new DefaultAuthenticationEventPublisher());
         return authenticationManager;
     }
 

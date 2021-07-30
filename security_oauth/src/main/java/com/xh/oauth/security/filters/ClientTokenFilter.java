@@ -48,6 +48,7 @@ public class ClientTokenFilter extends OncePerRequestFilter {
             SecurityContextHolder.clearContext();
             if (clientAuthentication != null) {
                 securityContext.setAuthentication(clientAuthentication);
+                logger.info("client authenticated from url parameters.");
             }
         }
         filterChain.doFilter(request, response);

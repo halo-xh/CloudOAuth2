@@ -31,13 +31,14 @@ public class UserAuthenticationProvider implements AuthenticationProvider {
         }
         Authentication userAuthentication = oauth2Authentication.getUserAuthentication();
         // haven't login(parse from jwt token), fast fail.
+        Oauth2Authentication aNew = ((Oauth2Authentication) authentication).createNew();
         if (userAuthentication == null) {
             logger.info("user haven't login(parse from jwt token), fast fail.");
-            return ((Oauth2Authentication) authentication).createNew();
+            return aNew;
         }
         // can get userAuthentication from jwt, start authenticate
         logger.info("can get user Authentication from jwt, can step in.");
-        return ((Oauth2Authentication) authentication).createNew();
+        return aNew;
     }
 
     @Override
