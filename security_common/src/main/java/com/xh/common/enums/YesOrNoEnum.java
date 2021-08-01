@@ -1,4 +1,4 @@
-package com.xh.oauth.utils;
+package com.xh.common.enums;
 
 public enum YesOrNoEnum {
     YES,

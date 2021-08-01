@@ -1,13 +1,19 @@
 server:
   port: 8001
 spring:
+  application:
+    name: third-client
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql:///oauth2
+    name: thirdDS
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://localhost:3306/test?serverTimezone=GMT%2b8&useSSL=false
     username: root
     password: 123456
-  main:
-    allow-bean-definition-overriding: true # 允许覆盖spring 创建的ioc对象
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      poolName: Hikari
+      auto-commit: true
+
 
 
 

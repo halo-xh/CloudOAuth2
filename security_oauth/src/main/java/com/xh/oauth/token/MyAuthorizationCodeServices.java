@@ -5,7 +5,7 @@ import com.xh.oauth.security.authenticate.AuthorizationCodeServices;
 import com.xh.oauth.security.authenticate.Oauth2Authentication;
 import com.xh.oauth.token.entity.OAuthCode;
 import com.xh.oauth.token.service.OAuthenticationStoreService;
-import com.xh.oauth.utils.YesOrNoEnum;
+import com.xh.common.enums.YesOrNoEnum;
 import com.xh.oauth.utils.SnowflakeIdWorker;
 import org.springframework.util.SerializationUtils;
 

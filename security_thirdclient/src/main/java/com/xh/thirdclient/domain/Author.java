@@ -1,7 +1,7 @@
-package com.xh.oauth.user.entity;
+package com.xh.thirdclient.domain;
 
 import com.xh.common.enums.YesOrNoEnum;
-import lombok.*;
+import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -11,32 +11,28 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * @author Xiao Hong
- * @since 2020-12-09
+ * author  Xiao Hong
+ * date  2021/7/30 23:45
+ * description
  */
 @Data
-@Table
+@Table(name = "tc_author")
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class Subject {
+public class Author {
 
     @Id
     @GeneratedValue(generator = "idCreator",
             strategy = GenerationType.SEQUENCE)
     @GenericGenerator(
             name = "idCreator",
-            strategy = "com.xh.oauth.utils.IdCreator"
+            strategy = "com.xh.thirdclient.utils.IdCreator"
     )
-    private Long sid;
+    private Long aid;
 
-    @Column(unique = true)
-    private String loginName;
+    private String name;
 
-    @Column
-    private String password;
-
-    @Column
-    private String status;
+    private Integer age;
 
     @Enumerated(EnumType.STRING)
     private YesOrNoEnum deleted = YesOrNoEnum.NO;
@@ -44,12 +40,10 @@ public class Subject {
     @CreatedDate
     private Date createDate;
 
-    @Column
     @LastModifiedDate
     private Date updateDate;
 
     @Version
-    @Column
     private Integer version;
 
 

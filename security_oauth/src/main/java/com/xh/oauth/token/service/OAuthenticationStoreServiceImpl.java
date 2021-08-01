@@ -2,7 +2,7 @@ package com.xh.oauth.token.service;
 
 import com.xh.oauth.token.entity.OAuthCode;
 import com.xh.oauth.token.repo.OAuthenticationStoreRepository;
-import com.xh.oauth.utils.YesOrNoEnum;
+import com.xh.common.enums.YesOrNoEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

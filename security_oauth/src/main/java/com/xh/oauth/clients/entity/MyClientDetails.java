@@ -1,6 +1,6 @@
 package com.xh.oauth.clients.entity;
 
-import com.xh.oauth.utils.YesOrNoEnum;
+import com.xh.common.enums.YesOrNoEnum;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

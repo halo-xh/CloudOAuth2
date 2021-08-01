@@ -1,10 +1,9 @@
 package com.xh.oauth.token.entity;
 
-import com.xh.oauth.utils.YesOrNoEnum;
+import com.xh.common.enums.YesOrNoEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

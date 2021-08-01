@@ -1,10 +1,10 @@
-package com.xh.security_thirdclient;
+package com.xh.thirdclient;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SecurityThirdclientApplicationTests {
+class SecurityThirdClientApplicationTests {
 
     @Test
     void contextLoads() {

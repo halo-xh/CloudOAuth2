@@ -2,8 +2,7 @@ package com.xh.oauth;
 
 import com.xh.oauth.clients.entity.MyClientDetails;
 import com.xh.oauth.clients.repo.MyClientDetailsRepository;
-import com.xh.oauth.utils.YesOrNoEnum;
-import org.checkerframework.checker.units.qual.A;
+import com.xh.common.enums.YesOrNoEnum;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
