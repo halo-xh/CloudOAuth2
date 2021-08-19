@@ -36,10 +36,10 @@ public class TcAuthorServiceImpl extends ServiceImpl<TcAuthorMapper, TcAuthor> i
 
     @Override
     public int saveAnother(SaveEvent saveEvent) {
-        TcAuthor tcAuthor = tcAuthorMapper.selectById(saveEvent.getAid());
+//        TcAuthor tcAuthor = tcAuthorMapper.selectById(saveEvent.getAid());
         TcAuthor tcAuthor1 = new TcAuthor();
-        tcAuthor1.setAge(tcAuthor.getAge() + 1);
-        tcAuthor1.setName(tcAuthor.getName());
+        tcAuthor1.setAge(888);
+        tcAuthor1.setName(saveEvent.getName());
         super.save(tcAuthor1);
         return 0;
     }

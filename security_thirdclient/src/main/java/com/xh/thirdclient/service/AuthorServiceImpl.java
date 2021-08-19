@@ -32,16 +32,19 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author create(Author author) {
+        System.out.println("123");
         Author save = authorRepo.save(author);
+        System.out.println("456");
         return save;
     }
 
     @Override
     public Author saveAnother(SaveEvent saveEvent) {
-        Author one = authorRepo.getOne(saveEvent.getAid());
+//        Author one = authorRepo.getOne(saveEvent.getAid());
         Author author = new Author();
-        author.setName(one.getName());
-        author.setAge(one.getAge() + 1);
+        author.setAid(saveEvent.getAid() + 1);
+        author.setName(saveEvent.getName());
+        author.setAge(777);
         Author save = authorRepo.save(author);
         return save;
     }

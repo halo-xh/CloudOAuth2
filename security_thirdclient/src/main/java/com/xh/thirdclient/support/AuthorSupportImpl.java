@@ -6,6 +6,7 @@ import com.xh.thirdclient.event.SaveEventListener;
 import com.xh.thirdclient.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +17,8 @@ import java.util.List;
  * date  2021/7/31 9:45
  * description
  */
-@Service
-@Transactional
+@Component
+//@Transactional
 public class AuthorSupportImpl implements AuthorSupport {
 
     private final AuthorService authorService;
@@ -39,7 +40,7 @@ public class AuthorSupportImpl implements AuthorSupport {
         Author author1 = authorService.create(author);
         SaveEvent saveEvent = new SaveEvent();
         saveEvent.setAid(author1.getAid());
-        saveEvent.setName(author1.getName());
+        saveEvent.setName(author1.getName() + "Event");
         publisher.publishEvent(saveEvent);
         return author1;
     }

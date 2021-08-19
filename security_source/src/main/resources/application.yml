@@ -1,5 +1,5 @@
 server:
-  port: 8001
+  port: 7778
 spring:
   application:
     name: third-client

@@ -4,10 +4,8 @@ import com.xh.thirdclient.domain.Author;
 import com.xh.thirdclient.service.AuthorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
@@ -16,8 +14,8 @@ import org.springframework.transaction.event.TransactionalEventListener;
  * description
  */
 @Slf4j
-@Component
-@Transactional(propagation = Propagation.REQUIRES_NEW)
+@Service
+//@Transactional(propagation = Propagation.REQUIRES_NEW)
 public class SaveEventListener {
 
     private final AuthorService authorService;
@@ -28,6 +26,7 @@ public class SaveEventListener {
 
     @TransactionalEventListener
     public void listen(@Payload SaveEvent saveEvent) {
+        log.info("saved author,{}", saveEvent);
         Author author = authorService.saveAnother(saveEvent);
         log.info("saved author,{}", author);
     }
